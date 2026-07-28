@@ -90,14 +90,15 @@ async function verificarRol(rolesPermitidos = []) {
     if (error) {
 
         console.error(error);
-        window.location.href = "dashboard.html";
+        alert("Tu cuenta todavía no tiene un rol asignado. Contacta al administrador.");
+        window.location.href = "index.html";
         return;
 
     }
 
 
-    // SI EL ROL NO ESTÁ PERMITIDO
-    if (!rolesPermitidos.includes(data.rol)) {
+    // SI EL ROL NO ESTÁ PERMITIDO (Administrador siempre tiene acceso total)
+    if (data.rol !== "Administrador" && !rolesPermitidos.includes(data.rol)) {
 
         alert("No tienes permisos para acceder a esta página.");
 
