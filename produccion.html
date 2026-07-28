@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ELROJO.3D - Producción</title>
+  </head>
+  <body>
+    <div class="dashboard">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <img src="images/logo.png" alt="Elrojo.3d" class="logo-box" />
+          <div>
+            <div class="logo">@Elrojo.3d</div>
+            <div class="subtitle">Impresión 3D</div>
+          </div>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span>Inicio</a>
+          <a href="inventario.html" class="nav-item"><span class="nav-icon">📦</span>Inventario</a>
+          <a href="produccion.html" class="nav-item active"><span class="nav-icon">🖨️</span>Producción</a>
+          <a href="ventas.html" class="nav-item"><span class="nav-icon">🧾</span>Ventas</a>
+        </nav>
+
+        <div class="sidebar-user">
+          <div class="user-menu-wrapper">
+            <button class="user-menu-btn" onclick="toggleNotifications(this)">
+              <span class="user-avatar">👤</span>
+              <span class="user-info">
+                <span class="user-name">Leonardo Narváez</span>
+                <span class="user-role">Ver cuenta</span>
+              </span>
+              <span class="user-caret">⌄</span>
+            </button>
+            <div class="user-menu">
+              <a href="#" class="user-menu-item danger" onclick="cerrarSesionSupabase(); return false;">🚪 Cerrar sesión</a>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="content">
+        <div class="notif-bar">
+          <div class="notif-wrapper">
+            <button class="icon-btn" aria-label="Notificaciones" onclick="toggleNotifications(this)">
+              🔔<span class="notif-dot"></span>
+            </button>
+            <div class="notif-panel">
+              <div class="notif-panel-header">Actividad reciente</div>
+              <div id="notifProduccion">
+                <div class="notif-item">Cargando...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="top">
+          <div class="top-brand mobile-only">
+            <img src="images/logo.png" alt="Elrojo.3d" class="top-logo" />
+            <div>
+              <div class="logo">@Elrojo.3d</div>
+              <div class="subtitle">Módulo de producción</div>
+            </div>
+          </div>
+
+          <div class="top-actions">
+            <div class="user-menu-wrapper">
+              <button class="icon-btn" aria-label="Perfil" onclick="toggleNotifications(this)">👤</button>
+              <div class="user-menu">
+                <a href="#" class="user-menu-item danger" onclick="cerrarSesionSupabase(); return false;">🚪 Cerrar sesión</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h1 class="page-title">Producción</h1>
+
+        <div class="inv-cards">
+          <div class="inv-card">
+            <h4>Producciones activas</h4>
+            <div class="inv-value" id="statActivas">0</div>
+          </div>
+          <div class="inv-card">
+            <h4>Pendientes</h4>
+            <div class="inv-value" id="statPendientes">0</div>
+          </div>
+          <div class="inv-card">
+            <h4>Impresoras</h4>
+            <div class="inv-value">1/1</div>
+          </div>
+          <div class="inv-card">
+            <h4>Listos hoy</h4>
+            <div class="inv-value" id="statListos">0</div>
+          </div>
+        </div>
+
+        <div class="inv-section">
+          <h3>Estado de las impresoras</h3>
+          <div class="inv-item">
+            <strong>Creality Hi</strong><br />
+            <span class="status printing">Imprimiendo</span><br />
+            Producto: Soporte Casco XTZ<br />Progreso: 85%
+            <div class="progress">
+              <div class="fill" style="width: 85%"></div>
+            </div>
+          </div>
+          <div class="inv-item">
+            <strong>Creality K1</strong><br />
+            <span class="status available">Disponible</span>
+          </div>
+        </div>
+
+        <div class="inv-section">
+          <h3>Flujo de producción</h3>
+          <div class="kanban-board" id="kanbanProduccion">
+            <div class="kanban-column">
+              <h4>🕓 Pendiente</h4>
+              <div id="colPendiente"></div>
+            </div>
+            <div class="kanban-column">
+              <h4>🖨️ En producción</h4>
+              <div id="colEnProduccion"></div>
+            </div>
+            <div class="kanban-column">
+              <h4>✅ Listo</h4>
+              <div id="colListo"></div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+    <button class="floating" aria-label="Agregar">+</button>
+
+    <div class="bottom-nav mobile-only">
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span>Inicio</a>
+      <a href="inventario.html" class="nav-item"><span class="nav-icon">📦</span>Inventario</a>
+      <a href="produccion.html" class="nav-item active"><span class="nav-icon">🖨️</span>Producción</a>
+      <a href="ventas.html" class="nav-item"><span class="nav-icon">🧾</span>Ventas</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth-guard.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/pedidos.js"></script>
+    <script src="js/produccion.js"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const autorizado = await verificarSesion();
+
+    if (!autorizado) {
+        return;
+    }
+
+});
+
+</script>
+
+  </body>
+</html>

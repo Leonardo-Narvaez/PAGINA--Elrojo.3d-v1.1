@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ELROJO.3D - Nueva venta</title>
+  </head>
+  <body>
+    <div class="dashboard">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <img src="images/logo.png" alt="Elrojo.3d" class="logo-box" />
+          <div>
+            <div class="logo">@Elrojo.3d</div>
+            <div class="subtitle">Impresión 3D</div>
+          </div>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span>Inicio</a>
+          <a href="inventario.html" class="nav-item"><span class="nav-icon">📦</span>Inventario</a>
+          <a href="produccion.html" class="nav-item"><span class="nav-icon">🖨️</span>Producción</a>
+          <a href="ventas.html" class="nav-item active"><span class="nav-icon">🧾</span>Ventas</a>
+        </nav>
+
+        <div class="sidebar-user">
+          <div class="user-menu-wrapper">
+            <button class="user-menu-btn" onclick="toggleNotifications(this)">
+              <span class="user-avatar">👤</span>
+              <span class="user-info">
+                <span class="user-name">Leonardo Narváez</span>
+                <span class="user-role">Ver cuenta</span>
+              </span>
+              <span class="user-caret">⌄</span>
+            </button>
+            <div class="user-menu">
+              <a href="#" class="user-menu-item danger" onclick="cerrarSesionSupabase(); return false;">🚪 Cerrar sesión</a>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="content">
+        <div class="top">
+          <div class="top-brand mobile-only">
+            <img src="images/logo.png" alt="Elrojo.3d" class="top-logo" />
+            <div>
+              <div class="logo">@Elrojo.3d</div>
+              <div class="subtitle">Nueva venta</div>
+            </div>
+          </div>
+
+          <div class="top-actions">
+            <div class="user-menu-wrapper">
+              <button class="icon-btn" aria-label="Perfil" onclick="toggleNotifications(this)">👤</button>
+              <div class="user-menu">
+                <a href="#" class="user-menu-item danger" onclick="cerrarSesionSupabase(); return false;">🚪 Cerrar sesión</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <a href="ventas.html" class="back-link desktop-only">← Volver a Ventas</a>
+        <h1 class="page-title">Nueva venta</h1>
+        <div class="description-left">Registra un nuevo pedido para producción.</div>
+
+        <form class="inv-section form-card" id="ventaForm">
+          <div class="input-group">
+            <label>Producto</label>
+            <select id="producto" required>
+              <option value="" disabled selected>Selecciona un producto</option>
+              <option>Placa Vehículos</option>
+              <option>Soporte Casco/Pared</option>
+              <option>Placas de mascotas</option>
+              <option>Llavero personalizado</option>
+              <option>Logo LED</option>
+              <option>Soporte GoPro</option>
+              <option>Porta celular moto</option>
+              <option>Base personalizada</option>
+              <option>Otro / personalizado</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label>Cliente</label>
+            <input type="text" id="cliente" placeholder="Nombre del cliente" required />
+          </div>
+
+          <div class="form-row">
+            <div class="input-group">
+              <label>Asesor</label>
+              <select id="asesor">
+                <option value="" disabled selected>Selecciona un asesor</option>
+                <option>Alexa</option>
+                <option>Leo</option>
+                <option>Otro</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label>Cantidad</label>
+              <input type="number" id="cantidad" min="1" value="1" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="input-group">
+              <label>Fecha de entrega</label>
+              <input type="date" id="fechaEntrega" />
+              <label class="checkbox-inline">
+                <input type="checkbox" id="sinDefinir" checked />
+                Sin definir
+              </label>
+            </div>
+
+            <div class="input-group">
+              <label>Estado</label>
+              <select id="estado">
+                <option>Pendiente</option>
+                <option>En producción</option>
+                <option>Listo</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>Estado de pago</label>
+            <select id="estadoPago">
+              <option>Pendiente</option>
+              <option>Pagado</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label>Observaciones</label>
+            <textarea id="observaciones" rows="4" placeholder="Personalización, referencias, colores, teléfono de contacto..."></textarea>
+          </div>
+
+          <div class="form-actions">
+            <a href="ventas.html" class="action">Cancelar</a>
+            <button type="submit" class="action primary">Guardar venta</button>
+          </div>
+        </form>
+      </main>
+    </div>
+
+    <div class="bottom-nav mobile-only">
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span>Inicio</a>
+      <a href="inventario.html" class="nav-item"><span class="nav-icon">📦</span>Inventario</a>
+      <a href="produccion.html" class="nav-item"><span class="nav-icon">🖨️</span>Producción</a>
+      <a href="ventas.html" class="nav-item active"><span class="nav-icon">🧾</span>Ventas</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth-guard.js"></script>
+    <script src="js/main.js"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const autorizado = await verificarSesion();
+
+    if (!autorizado) {
+        return;
+    }
+
+});
+
+</script>
+
+  </body>
+</html>

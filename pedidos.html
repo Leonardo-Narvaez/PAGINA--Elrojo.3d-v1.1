@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ELROJO.3D - Pedidos</title>
+  </head>
+  <body>
+    <div class="dashboard">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <img src="images/logo.png" alt="Elrojo.3d" class="logo-box" />
+          <div>
+            <div class="logo">@Elrojo.3d</div>
+            <div class="subtitle">Impresión 3D</div>
+          </div>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span>Inicio</a>
+          <a href="inventario.html" class="nav-item"><span class="nav-icon">📦</span>Inventario</a>
+          <a href="produccion.html" class="nav-item active"><span class="nav-icon">🖨️</span>Producción</a>
+          <a href="ventas.html" class="nav-item"><span class="nav-icon">🧾</span>Ventas</a>
+        </nav>
+
+        <div class="sidebar-user">
+          <div class="user-menu-wrapper">
+            <button class="user-menu-btn" onclick="toggleNotifications(this)">
+              <span class="user-avatar">👤</span>
+              <span class="user-info">
+                <span class="user-name">Leonardo Narváez</span>
+                <span class="user-role">Ver cuenta</span>
+              </span>
+              <span class="user-caret">⌄</span>
+            </button>
+            <div class="user-menu">
+              <a href="#" class="user-menu-item danger" onclick="cerrarSesionSupabase(); return false;">🚪 Cerrar sesión</a>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="content">
+        <div class="top">
+          <div class="top-brand mobile-only">
+            <img src="images/logo.png" alt="Elrojo.3d" class="top-logo" />
+            <div>
+              <div class="logo">@Elrojo.3d</div>
+              <div class="subtitle">Pedidos</div>
+            </div>
+          </div>
+
+          <div class="top-actions">
+            <div class="user-menu-wrapper">
+              <button class="icon-btn" aria-label="Perfil" onclick="toggleNotifications(this)">👤</button>
+              <div class="user-menu">
+                <a href="#" class="user-menu-item danger" onclick="cerrarSesionSupabase(); return false;">🚪 Cerrar sesión</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <a href="dashboard.html" class="back-link desktop-only">← Volver a Inicio</a>
+        <h1 class="page-title">Pedidos</h1>
+        <div class="description-left">Trazabilidad de cada pedido, de principio a fin.</div>
+
+        <div class="filter-group-label">Estado del pedido</div>
+        <div class="filter-tabs" data-filter-group="estado">
+          <button class="filter-tab active" data-filter="todos">Todos</button>
+          <button class="filter-tab" data-filter="Pendiente">Pendiente</button>
+          <button class="filter-tab" data-filter="En producción">En producción</button>
+          <button class="filter-tab" data-filter="Listo">Listo</button>
+        </div>
+
+        <div class="filter-group-label">Estado de pago</div>
+        <div class="filter-tabs" data-filter-group="pago">
+          <button class="filter-tab active" data-filter="todos">Todos</button>
+          <button class="filter-tab" data-filter="Por pagar">Por pagar</button>
+          <button class="filter-tab" data-filter="Pagado">Pagado</button>
+        </div>
+
+        <div class="pedidos-list" id="listaPedidos"></div>
+      </main>
+    </div>
+
+    <button class="floating" aria-label="Agregar" onclick="window.location.href='nueva-venta.html'">+</button>
+
+    <div class="bottom-nav mobile-only">
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span>Inicio</a>
+      <a href="inventario.html" class="nav-item"><span class="nav-icon">📦</span>Inventario</a>
+      <a href="produccion.html" class="nav-item active"><span class="nav-icon">🖨️</span>Producción</a>
+      <a href="ventas.html" class="nav-item"><span class="nav-icon">🧾</span>Ventas</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth-guard.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/pedidos.js"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const autorizado = await verificarSesion();
+
+    if (!autorizado) {
+        return;
+    }
+
+});
+
+</script>
+
+  </body>
+</html>

@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ELROJO.3D - Reportes</title>
+  </head>
+  <body>
+    <div class="dashboard">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <img src="images/logo.png" alt="Elrojo.3d" class="logo-box" />
+          <div>
+            <div class="logo">@Elrojo.3d</div>
+            <div class="subtitle">Impresión 3D</div>
+          </div>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span>Inicio</a>
+          <a href="inventario.html" class="nav-item"><span class="nav-icon">📦</span>Inventario</a>
+          <a href="produccion.html" class="nav-item"><span class="nav-icon">🖨️</span>Producción</a>
+          <a href="ventas.html" class="nav-item"><span class="nav-icon">🧾</span>Ventas</a>
+          <a href="administrador.html" class="nav-item active"><span class="nav-icon">👑</span>Administrador</a>
+        </nav>
+
+        <div class="sidebar-user">
+          <div class="user-menu-wrapper">
+            <button class="user-menu-btn" onclick="toggleNotifications(this)">
+              <span class="user-avatar">👤</span>
+              <span class="user-info">
+                <span class="user-name">Leonardo Narváez</span>
+                <span class="user-role">Ver cuenta</span>
+              </span>
+              <span class="user-caret">⌄</span>
+            </button>
+            <div class="user-menu">
+              <a href="#" class="user-menu-item danger" onclick="cerrarSesionSupabase(); return false;">🚪 Cerrar sesión</a>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="content">
+        <div class="notif-bar">
+          <div class="notif-wrapper">
+            <button class="icon-btn" aria-label="Notificaciones" onclick="toggleNotifications(this)">
+              🔔<span class="notif-dot"></span>
+            </button>
+            <div class="notif-panel">
+              <div class="notif-panel-header">Actividad reciente</div>
+              <div class="notif-item">Se generó el reporte mensual automáticamente.</div>
+              <div class="notif-item">Las ventas aumentaron un 18%.</div>
+              <div class="notif-item">Inventario actualizado correctamente.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="top">
+          <div class="top-brand mobile-only">
+            <img src="images/logo.png" alt="Elrojo.3d" class="top-logo" />
+            <div>
+              <div class="logo">REPORTES</div>
+              <div class="subtitle">Centro de inteligencia del negocio</div>
+            </div>
+          </div>
+
+          <div class="top-actions">
+            <div class="user-menu-wrapper">
+              <button class="icon-btn" aria-label="Perfil" onclick="toggleNotifications(this)">👤</button>
+              <div class="user-menu">
+                <a href="#" class="user-menu-item danger" onclick="cerrarSesionSupabase(); return false;">🚪 Cerrar sesión</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h1 class="page-title desktop-only">Reportes</h1>
+        <div class="description-left desktop-only">Centro de inteligencia del negocio</div>
+
+        <div class="health-card">
+          <h2 class="health-title">Business score</h2>
+          <div class="health-score">95 / 100</div>
+          <p class="score-tag">Excelente</p>
+          <div class="score-breakdown">
+            <p>Ventas .............. 98%</p>
+            <p>Producción .......... 94%</p>
+            <p>Inventario .......... 91%</p>
+            <p>Clientes ............ 96%</p>
+            <p>Rentabilidad ........ 92%</p>
+            <p>Marketing ........... 88%</p>
+          </div>
+        </div>
+
+        <div class="health-card">
+          <h2 class="health-title">Salud del negocio</h2>
+          <div class="health-score">94%</div>
+          <ul>
+            <li>Tus ventas aumentaron un 18%.</li>
+            <li>Producción al 85%.</li>
+            <li>Inventario saludable.</li>
+            <li>Clientes VIP aumentaron un 12%.</li>
+          </ul>
+        </div>
+
+        <div class="inv-section">
+          <h3>Resumen ejecutivo</h3>
+          <div class="inv-cards inv-cards-6">
+            <div class="inv-card">
+              <h4>Ventas</h4>
+              <div class="inv-value">$5.4M</div>
+            </div>
+            <div class="inv-card">
+              <h4>Ganancia</h4>
+              <div class="inv-value">$3.2M</div>
+            </div>
+            <div class="inv-card">
+              <h4>Pedidos</h4>
+              <div class="inv-value">86</div>
+            </div>
+            <div class="inv-card">
+              <h4>Productos</h4>
+              <div class="inv-value">134</div>
+            </div>
+            <div class="inv-card">
+              <h4>Clientes</h4>
+              <div class="inv-value">18</div>
+            </div>
+            <div class="inv-card">
+              <h4>Recompra</h4>
+              <div class="inv-value">74%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inv-section">
+          <h3>Ventas - Últimos 30 días</h3>
+          <div class="bar-chart">
+            <div class="bar" style="height: 40%"></div>
+            <div class="bar" style="height: 65%"></div>
+            <div class="bar" style="height: 55%"></div>
+            <div class="bar" style="height: 80%"></div>
+            <div class="bar" style="height: 70%"></div>
+            <div class="bar" style="height: 90%"></div>
+          </div>
+        </div>
+
+        <div class="inv-section">
+          <h3>Producción</h3>
+          <ul>
+            <li>58 pedidos producidos.</li>
+            <li>145 horas de impresión.</li>
+            <li>3 impresiones fallidas.</li>
+            <li>Tiempo promedio: 6 horas.</li>
+          </ul>
+        </div>
+
+        <div class="inv-section">
+          <h3>Inventario</h3>
+          <ul>
+            <li>Salud del inventario: 92%</li>
+            <li>8.5 Kg de filamento disponibles.</li>
+            <li>4 productos agotados.</li>
+            <li>PLA Negro es el más utilizado.</li>
+          </ul>
+        </div>
+
+        <div class="inv-section">
+          <h3>Clientes</h3>
+          <ul>
+            <li>Cliente del mes: Leonardo.</li>
+            <li>Clientes VIP: 8.</li>
+            <li>Clientes nuevos: 18.</li>
+            <li>Recompra: 78%.</li>
+          </ul>
+        </div>
+
+        <div class="inv-section">
+          <h3>Top productos</h3>
+          <ul>
+            <li>Soporte Casco - 45 ventas.</li>
+            <li>Logo LED - 31 ventas.</li>
+            <li>Llavero Personalizado - 26 ventas.</li>
+            <li>Base Gamer - 18 ventas.</li>
+          </ul>
+        </div>
+
+        <div class="health-card">
+          <h2 class="health-title">IA del negocio</h2>
+          <ul>
+            <li>Tus ventas aumentan los fines de semana.</li>
+            <li>El PLA Negro genera el 45% de las ventas.</li>
+            <li>Tus clientes VIP compran cada 18 días.</li>
+            <li>Tus productos personalizados son más rentables.</li>
+          </ul>
+        </div>
+
+        <div class="health-card">
+          <h2 class="health-title">Recomendaciones</h2>
+          <ul>
+            <li>Comprar 3 Kg de PLA Negro.</li>
+            <li>Promocionar logos personalizados.</li>
+            <li>Crear combo motociclista.</li>
+            <li>Producir 25 soportes para casco.</li>
+          </ul>
+        </div>
+
+        <div class="inv-section">
+          <h3>Exportar reportes</h3>
+          <div class="export-btn">📄 Exportar PDF</div>
+          <div class="export-btn">📊 Exportar Excel</div>
+          <div class="export-btn">📑 Exportar CSV</div>
+          <div class="export-btn">✉️ Enviar por correo</div>
+        </div>
+      </main>
+    </div>
+
+    <button class="floating" aria-label="Agregar">+</button>
+
+    <div class="bottom-nav mobile-only">
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span>Inicio</a>
+      <a href="inventario.html" class="nav-item"><span class="nav-icon">📦</span>Inventario</a>
+      <a href="produccion.html" class="nav-item"><span class="nav-icon">🖨️</span>Producción</a>
+      <a href="ventas.html" class="nav-item"><span class="nav-icon">🧾</span>Ventas</a>
+      <a href="administrador.html" class="nav-item active"><span class="nav-icon">👑</span>Admin</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth-guard.js"></script>
+    <script src="js/main.js"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const autorizado = await verificarSesion();
+
+    if (!autorizado) {
+        return;
+    }
+
+});
+
+</script>
+
+  </body>
+</html>

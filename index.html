@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ELROJO.3D- Login</title>
+    
+  </head>
+  <body>
+    <div class="page">
+      <div class="brand-panel">
+        <div class="brand-content">
+          <img src="images/logo.png" alt="Elrojo.3d" class="logo-box" />
+          <div class="logo">@Elrojo.3d</div>
+          <div class="subtitle">Impresión 3D</div>
+          <p class="brand-text">
+            Administra pedidos, producción e inventario de tu taller de impresión 3D desde un solo lugar.
+          </p>
+        </div>
+      </div>
+
+      <div class="form-panel">
+        <div class="phone">
+          <img src="images/logo.png" alt="Elrojo.3d" class="logo-box mobile-only" />
+          <div class="logo mobile-only">@Elrojo.3d</div>
+          <div class="subtitle mobile-only">Impresión 3D</div>
+
+          <div class="welcome">Bienvenido</div>
+          <div class="description">
+            Inicia sesión para administrar tu negocio desde cualquier lugar.
+          </div>
+
+          <div class="input-group">
+            <label>Correo electrónico</label>
+            <input type="email" placeholder="correo@elrojo3d.com" />
+          </div>
+
+          <div class="input-group">
+            <label>Contraseña</label>
+            <input type="password" placeholder="••••••••" />
+          </div>
+
+          <div class="options">
+            <span>Recordarme</span>
+            <a href="recuperar-password.html">¿Olvidaste tu contraseña?</a>
+          </div>
+
+          <button class="login-btn" onclick="login()">Ingresar al Dashboard</button>
+
+          <div class="footer">
+            @Elrojo.3d v1.0<br />
+            Diseñado para la gestión profesional de impresión 3D.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/main.js"></script>
+
+  </body>
+</html>

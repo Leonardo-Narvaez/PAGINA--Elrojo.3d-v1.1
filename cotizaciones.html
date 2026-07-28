@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ELROJO.3D - Cotizaciones</title>
+  </head>
+  <body>
+    <div class="dashboard">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <img src="images/logo.png" alt="Elrojo.3d" class="logo-box" />
+          <div>
+            <div class="logo">@Elrojo.3d</div>
+            <div class="subtitle">Impresión 3D</div>
+          </div>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span>Inicio</a>
+          <a href="inventario.html" class="nav-item"><span class="nav-icon">📦</span>Inventario</a>
+          <a href="produccion.html" class="nav-item"><span class="nav-icon">🖨️</span>Producción</a>
+          <a href="ventas.html" class="nav-item active"><span class="nav-icon">🧾</span>Ventas</a>
+        </nav>
+
+        <div class="sidebar-user">
+          <div class="user-menu-wrapper">
+            <button class="user-menu-btn" onclick="toggleNotifications(this)">
+              <span class="user-avatar">👤</span>
+              <span class="user-info">
+                <span class="user-name">Leonardo Narváez</span>
+                <span class="user-role">Ver cuenta</span>
+              </span>
+              <span class="user-caret">⌄</span>
+            </button>
+            <div class="user-menu">
+              <a href="#" class="user-menu-item danger" onclick="cerrarSesionSupabase(); return false;">🚪 Cerrar sesión</a>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="content">
+        <div class="top">
+          <div class="top-brand mobile-only">
+            <img src="images/logo.png" alt="Elrojo.3d" class="top-logo" />
+            <div>
+              <div class="logo">@Elrojo.3d</div>
+              <div class="subtitle">Cotizaciones</div>
+            </div>
+          </div>
+          <div class="top-actions">
+            <div class="user-menu-wrapper">
+              <button class="icon-btn" aria-label="Perfil" onclick="toggleNotifications(this)">👤</button>
+              <div class="user-menu">
+                <a href="#" class="user-menu-item danger" onclick="cerrarSesionSupabase(); return false;">🚪 Cerrar sesión</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <a href="ventas.html" class="back-link desktop-only">← Volver a Ventas</a>
+        <h1 class="page-title">Nueva cotización</h1>
+        <div class="description-left">Arma la cotización, calcula costos y define el precio antes de enviarla.</div>
+
+        <!-- ===== 1. Información del cliente ===== -->
+        <div class="inv-section">
+          <h3>1. Información del cliente</h3>
+          <div class="form-row">
+            <div class="input-group">
+              <label>Nombre del cliente</label>
+              <input type="text" id="cotCliente" placeholder="Nombre completo" required />
+            </div>
+            <div class="input-group">
+              <label>WhatsApp</label>
+              <input type="tel" id="cotWhatsapp" placeholder="Ej. 3001234567" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="input-group">
+              <label>Correo (opcional)</label>
+              <input type="email" id="cotCorreo" placeholder="cliente@correo.com" />
+            </div>
+            <div class="input-group">
+              <label>Ciudad</label>
+              <input type="text" id="cotCiudad" placeholder="Ej. Barranquilla" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="input-group">
+              <label>Fecha de la cotización</label>
+              <input type="date" id="cotFecha" />
+            </div>
+            <div class="input-group">
+              <label>Estado</label>
+              <select id="cotEstado">
+                <option>Pendiente</option>
+                <option>Aprobada</option>
+                <option>Rechazada</option>
+                <option>En espera</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== 2. Productos ===== -->
+        <div class="inv-section">
+          <div class="admin-view-header">
+            <h3 style="margin: 0">2. Productos</h3>
+            <button type="button" class="action primary add-btn" onclick="agregarProducto()">➕ Agregar producto</button>
+          </div>
+          <div id="productosContainer"></div>
+        </div>
+
+        <!-- ===== 3. Tarifas de costos (configurable) ===== -->
+        <details class="inv-section cost-settings">
+          <summary>⚙️ Tarifas de costos (ajústalas a tu negocio)</summary>
+          <div class="form-row">
+            <div class="input-group">
+              <label>Filamento ($/gramo)</label>
+              <input type="number" id="tarifaFilamento" value="85" min="0" />
+            </div>
+            <div class="input-group">
+              <label>Electricidad ($/hora)</label>
+              <input type="number" id="tarifaElectricidad" value="300" min="0" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="input-group">
+              <label>Empaque ($/unidad)</label>
+              <input type="number" id="tarifaEmpaque" value="500" min="0" />
+            </div>
+            <div class="input-group">
+              <label>Desgaste impresora ($/hora)</label>
+              <input type="number" id="tarifaDesgaste" value="400" min="0" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="input-group">
+              <label>Mano de obra ($/hora)</label>
+              <input type="number" id="tarifaManoObra" value="2000" min="0" />
+            </div>
+            <div class="input-group">
+              <label>Comisión de ventas (%)</label>
+              <input type="number" id="tarifaComision" value="5" min="0" max="100" />
+            </div>
+          </div>
+        </details>
+
+        <!-- ===== 4. Precio de venta ===== -->
+        <div class="inv-section">
+          <h3>4. Precio de venta</h3>
+          <div class="filter-tabs" id="margenTabs">
+            <button class="filter-tab" data-margen="30">Margen 30%</button>
+            <button class="filter-tab active" data-margen="50">Margen 50%</button>
+            <button class="filter-tab" data-margen="80">Margen 80%</button>
+            <button class="filter-tab" data-margen="custom">Personalizado</button>
+          </div>
+          <div class="input-group" id="margenPersonalizadoWrap" style="display: none; max-width: 200px">
+            <label>Margen personalizado (%)</label>
+            <input type="number" id="margenPersonalizado" min="0" max="95" value="50" />
+          </div>
+        </div>
+
+        <!-- ===== 5. Cotización final ===== -->
+        <div class="inv-section quote-preview" id="quotePreview">
+          <div class="quote-header">
+            <img src="images/logo.png" alt="Elrojo.3d" class="quote-logo" />
+            <div>
+              <div class="quote-brand">@Elrojo.3d</div>
+              <div class="quote-brand-sub">Impresión 3D</div>
+            </div>
+            <div class="quote-number">
+              <div id="quoteFolio">COT-0000</div>
+              <div id="quoteFecha" class="muted"></div>
+            </div>
+          </div>
+
+          <div class="quote-client">
+            <strong id="quoteClienteNombre">-</strong>
+            <span id="quoteClienteMeta">-</span>
+          </div>
+
+          <table class="quote-table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Cant.</th>
+                <th>Precio unit.</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody id="quoteTableBody"></tbody>
+          </table>
+
+          <div class="quote-total">
+            Total: <span id="quoteTotal">$0</span>
+          </div>
+
+          <div class="form-row">
+            <div class="input-group">
+              <label>Tiempo de entrega</label>
+              <input type="text" id="quoteEntrega" placeholder="Ej. 5-7 días hábiles" />
+            </div>
+            <div class="input-group">
+              <label>Garantía</label>
+              <input type="text" id="quoteGarantia" placeholder="Ej. 30 días por defectos de fabricación" />
+            </div>
+          </div>
+          <div class="input-group">
+            <label>Método de pago</label>
+            <select id="quoteMetodoPago">
+              <option>Efectivo</option>
+              <option>Transferencia</option>
+              <option>Efectivo o transferencia</option>
+              <option>50% anticipo - 50% contra entrega</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- ===== 6. Acciones rápidas ===== -->
+        <div class="inv-section quote-actions no-print">
+          <h3>6. Acciones rápidas</h3>
+          <div class="actions actions-wrap">
+            <button type="button" class="action primary" onclick="guardarCotizacion()">💾 Guardar cotización</button>
+            <button type="button" class="action" onclick="duplicarCotizacionActual()">📋 Duplicar</button>
+            <button type="button" class="action" onclick="convertirEnOrden()">🖨️ Convertir en orden de producción</button>
+            <button type="button" class="action" onclick="convertirEnVenta()">🧾 Convertir en venta</button>
+            <button type="button" class="action" onclick="window.print()">📄 Descargar PDF</button>
+            <button type="button" class="action" onclick="compartirWhatsApp()">💬 Compartir por WhatsApp</button>
+            <button type="button" class="action" onclick="window.print()">🖨️ Imprimir</button>
+          </div>
+        </div>
+
+        <!-- ===== Cotizaciones guardadas ===== -->
+        <div class="inv-section no-print">
+          <h3>Cotizaciones guardadas</h3>
+          <div class="stock-list" id="listaCotizaciones"></div>
+        </div>
+      </main>
+    </div>
+
+    <div class="bottom-nav mobile-only">
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span>Inicio</a>
+      <a href="inventario.html" class="nav-item"><span class="nav-icon">📦</span>Inventario</a>
+      <a href="produccion.html" class="nav-item"><span class="nav-icon">🖨️</span>Producción</a>
+      <a href="ventas.html" class="nav-item active"><span class="nav-icon">🧾</span>Ventas</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth-guard.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/cotizaciones.js"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const autorizado = await verificarSesion();
+
+    if (!autorizado) {
+        return;
+    }
+
+});
+
+</script>
+
+  </body>
+</html>

@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ELROJO.3D - Gestión de inventario</title>
+  </head>
+  <body>
+    <div class="dashboard">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <img src="images/logo.png" alt="Elrojo.3d" class="logo-box" />
+          <div>
+            <div class="logo">@Elrojo.3d</div>
+            <div class="subtitle">Impresión 3D</div>
+          </div>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span>Inicio</a>
+          <a href="inventario.html" class="nav-item"><span class="nav-icon">📦</span>Inventario</a>
+          <a href="produccion.html" class="nav-item"><span class="nav-icon">🖨️</span>Producción</a>
+          <a href="ventas.html" class="nav-item"><span class="nav-icon">🧾</span>Ventas</a>
+          <a href="administrador.html" class="nav-item active"><span class="nav-icon">👑</span>Administrador</a>
+        </nav>
+
+        <div class="sidebar-user">
+          <div class="user-menu-wrapper">
+            <button class="user-menu-btn" onclick="toggleNotifications(this)">
+              <span class="user-avatar">👤</span>
+              <span class="user-info">
+                <span class="user-name">Leonardo Narváez</span>
+                <span class="user-role">Ver cuenta</span>
+              </span>
+              <span class="user-caret">⌄</span>
+            </button>
+            <div class="user-menu">
+              <a href="#" class="user-menu-item danger" onclick="cerrarSesionSupabase(); return false;">🚪 Cerrar sesión</a>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="content">
+        <div class="top">
+          <div class="top-brand mobile-only">
+            <img src="images/logo.png" alt="Elrojo.3d" class="top-logo" />
+            <div>
+              <div class="logo">@Elrojo.3d</div>
+              <div class="subtitle">Gestión de inventario</div>
+            </div>
+          </div>
+
+          <div class="top-actions">
+            <div class="user-menu-wrapper">
+              <button class="icon-btn" aria-label="Perfil" onclick="toggleNotifications(this)">👤</button>
+              <div class="user-menu">
+                <a href="#" class="user-menu-item danger" onclick="cerrarSesionSupabase(); return false;">🚪 Cerrar sesión</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <a href="administrador.html" class="back-link desktop-only">← Volver al Panel administrativo</a>
+        <h1 class="page-title">Gestión de inventario</h1>
+        <div class="description-left">Agrega, edita o elimina filamentos y productos del catálogo.</div>
+
+        <div class="filter-tabs" id="viewTabs">
+          <button class="filter-tab active" data-view="filamentos">🧵 Filamentos</button>
+          <button class="filter-tab" data-view="productos">📦 Productos</button>
+        </div>
+
+        <!-- ===== Vista: Filamentos ===== -->
+        <section id="viewFilamentos" class="admin-view">
+          <div class="admin-view-header">
+            <span class="admin-count" id="countFilamentos">0 filamentos</span>
+            <button class="action primary add-btn" onclick="abrirModalFilamento()">➕ Nuevo filamento</button>
+          </div>
+          <div class="stock-list" id="listaFilamentos"></div>
+        </section>
+
+        <!-- ===== Vista: Productos ===== -->
+        <section id="viewProductos" class="admin-view" style="display: none">
+          <div class="admin-view-header">
+            <span class="admin-count" id="countProductos">0 productos</span>
+            <button class="action primary add-btn" onclick="abrirModalProducto()">➕ Nuevo producto</button>
+          </div>
+          <div class="stock-list" id="listaProductos"></div>
+        </section>
+      </main>
+    </div>
+
+    <div class="bottom-nav mobile-only">
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span>Inicio</a>
+      <a href="inventario.html" class="nav-item"><span class="nav-icon">📦</span>Inventario</a>
+      <a href="produccion.html" class="nav-item"><span class="nav-icon">🖨️</span>Producción</a>
+      <a href="ventas.html" class="nav-item"><span class="nav-icon">🧾</span>Ventas</a>
+      <a href="administrador.html" class="nav-item active"><span class="nav-icon">👑</span>Admin</a>
+    </div>
+
+    <!-- ===== Modal: Filamento ===== -->
+    <div class="modal-overlay" id="modalOverlayFilamento">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3 id="modalFilamentoTitulo">Nuevo filamento</h3>
+          <button type="button" class="modal-close" onclick="cerrarModales()">✕</button>
+        </div>
+        <form id="formFilamento">
+          <input type="hidden" id="filamentoId" />
+
+          <div class="input-group">
+            <label>Nombre</label>
+            <input type="text" id="filamentoNombre" placeholder="Ej. PLA+ Rojo" required />
+          </div>
+
+          <div class="form-row">
+            <div class="input-group">
+              <label>Marca</label>
+              <input type="text" id="filamentoMarca" placeholder="Ej. SUNLU" />
+            </div>
+            <div class="input-group">
+              <label>Color</label>
+              <input type="text" id="filamentoColor" placeholder="Ej. Rojo" />
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>Material</label>
+            <select id="filamentoMaterial">
+              <option>PLA</option>
+              <option>PLA+</option>
+              <option>PETG</option>
+              <option>ABS</option>
+              <option>TPU</option>
+              <option>Otro</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="input-group">
+              <label>Peso (g)</label>
+              <input type="number" id="filamentoPeso" min="0" placeholder="1000" required />
+            </div>
+            <div class="input-group">
+              <label>Peso disponible (g)</label>
+              <input type="number" id="filamentoDisponible" min="0" placeholder="1000" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="input-group">
+              <label>Precio de compra</label>
+              <input type="number" id="filamentoPrecio" min="0" placeholder="85000" />
+            </div>
+            <div class="input-group">
+              <label>Fecha de compra</label>
+              <input type="date" id="filamentoFecha" />
+            </div>
+          </div>
+
+          <label class="checkbox-inline">
+            <input type="checkbox" id="filamentoActivo" checked />
+            Filamento activo
+          </label>
+
+          <div class="form-actions">
+            <button type="button" class="action" onclick="cerrarModales()">Cancelar</button>
+            <button type="submit" class="action primary">Guardar filamento</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ===== Modal: Producto ===== -->
+    <div class="modal-overlay" id="modalOverlayProducto">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3 id="modalProductoTitulo">Nuevo producto</h3>
+          <button type="button" class="modal-close" onclick="cerrarModales()">✕</button>
+        </div>
+        <form id="formProducto">
+          <input type="hidden" id="productoId" />
+
+          <div class="input-group">
+            <label>Nombre</label>
+            <input type="text" id="productoNombre" placeholder="Ej. Soporte Casco XTZ" required />
+          </div>
+
+          <div class="input-group">
+            <label>Descripción</label>
+            <textarea id="productoDescripcion" rows="3" placeholder="Breve descripción del producto..."></textarea>
+          </div>
+
+          <div class="input-group">
+            <label>Categoría</label>
+            <input type="text" id="productoCategoria" placeholder="Ej. Accesorios moto" />
+          </div>
+
+          <div class="form-row">
+            <div class="input-group">
+              <label>Precio de venta</label>
+              <input type="number" id="productoPrecioVenta" min="0" placeholder="18000" required />
+            </div>
+            <div class="input-group">
+              <label>Costo de producción</label>
+              <input type="number" id="productoCosto" min="0" placeholder="4250" />
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>Tiempo de impresión</label>
+            <input type="text" id="productoTiempo" placeholder="Ej. 3h 20m" />
+          </div>
+
+          <label class="checkbox-inline">
+            <input type="checkbox" id="productoActivo" checked />
+            Producto activo
+          </label>
+
+          <div class="form-actions">
+            <button type="button" class="action" onclick="cerrarModales()">Cancelar</button>
+            <button type="submit" class="action primary">Guardar producto</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth-guard.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/inventario-admin.js"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const autorizado = await verificarSesion();
+
+    if (!autorizado) {
+        return;
+    }
+
+});
+
+</script>
+
+  </body>
+</html>

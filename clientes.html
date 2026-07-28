@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ELROJO.3D - Clientes</title>
+  </head>
+  <body>
+    <div class="dashboard">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <img src="images/logo.png" alt="Elrojo.3d" class="logo-box" />
+          <div>
+            <div class="logo">@Elrojo.3d</div>
+            <div class="subtitle">Impresión 3D</div>
+          </div>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span>Inicio</a>
+          <a href="inventario.html" class="nav-item"><span class="nav-icon">📦</span>Inventario</a>
+          <a href="produccion.html" class="nav-item"><span class="nav-icon">🖨️</span>Producción</a>
+          <a href="ventas.html" class="nav-item active"><span class="nav-icon">🧾</span>Ventas</a>
+        </nav>
+
+        <div class="sidebar-user">
+          <div class="user-menu-wrapper">
+            <button class="user-menu-btn" onclick="toggleNotifications(this)">
+              <span class="user-avatar">👤</span>
+              <span class="user-info">
+                <span class="user-name">Leonardo Narváez</span>
+                <span class="user-role">Ver cuenta</span>
+              </span>
+              <span class="user-caret">⌄</span>
+            </button>
+            <div class="user-menu">
+              <a href="#" class="user-menu-item danger" onclick="cerrarSesionSupabase(); return false;">🚪 Cerrar sesión</a>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="content">
+        <div class="notif-bar">
+          <div class="notif-wrapper">
+            <button class="icon-btn" aria-label="Notificaciones" onclick="toggleNotifications(this)">
+              🔔<span class="notif-dot"></span>
+            </button>
+            <div class="notif-panel">
+              <div class="notif-panel-header">Actividad reciente</div>
+              <div class="notif-item">Nuevo cliente registrado.</div>
+              <div class="notif-item">Pedido entregado.</div>
+              <div class="notif-item">Cliente VIP agregado.</div>
+              <div class="notif-item">Cotización enviada.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="top">
+          <div class="top-brand mobile-only">
+            <img src="images/logo.png" alt="Elrojo.3d" class="top-logo" />
+            <div>
+              <div class="logo">CLIENTES</div>
+              <div class="subtitle">CRM inteligente - ELROJO OS</div>
+            </div>
+          </div>
+
+          <div class="top-actions">
+            <div class="user-menu-wrapper">
+              <button class="icon-btn" aria-label="Perfil" onclick="toggleNotifications(this)">👤</button>
+              <div class="user-menu">
+                <a href="#" class="user-menu-item danger" onclick="cerrarSesionSupabase(); return false;">🚪 Cerrar sesión</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h1 class="page-title desktop-only">Clientes</h1>
+        <div class="description-left desktop-only">CRM inteligente - ELROJO OS</div>
+
+        <input type="text" class="search-input" id="clienteBuscar" placeholder="Buscar cliente, teléfono o ciudad..." />
+
+        <div class="health-card">
+          <h2 class="health-title">❤️ Salud de los clientes</h2>
+          <div class="health-score">96%</div>
+          <ul>
+            <li>Excelente fidelización.</li>
+            <li>4 clientes próximos a VIP.</li>
+            <li>Satisfacción: 9.6 / 10.</li>
+          </ul>
+        </div>
+
+        <div class="health-card">
+          <h2 class="health-title">⚠ Clientes que requieren atención</h2>
+          <ul>
+            <li>Leonardo espera una cotización.</li>
+            <li>Carlos tiene un pedido listo.</li>
+            <li>Andrés lleva 95 días sin comprar.</li>
+            <li>María tiene un pago pendiente.</li>
+          </ul>
+        </div>
+
+        <div class="inv-section">
+          <h3>📊 Dashboard general</h3>
+          <div class="inv-cards">
+            <div class="inv-card">
+              <h4>Registrados</h4>
+              <div class="inv-value" id="statRegistrados">0</div>
+            </div>
+            <div class="inv-card">
+              <h4>Ciudades</h4>
+              <div class="inv-value" id="statCiudades">0</div>
+            </div>
+            <div class="inv-card">
+              <h4>VIP</h4>
+              <div class="inv-value" id="statVip">0</div>
+            </div>
+            <div class="inv-card">
+              <h4>Nuevos (30 días)</h4>
+              <div class="inv-value" id="statNuevos">0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inv-section">
+          <h3>📈 Métricas CRM</h3>
+          <ul>
+            <li>Ticket promedio: $86.500</li>
+            <li>Valor promedio: $215.000</li>
+            <li>Tiempo entre compras: 18 días.</li>
+            <li>Recompra: 78%</li>
+          </ul>
+        </div>
+
+        <div class="inv-section">
+          <h3>📡 Radar de clientes</h3>
+          <ul>
+            <li>3 clientes próximos a VIP.</li>
+            <li>2 clientes inactivos.</li>
+            <li>4 compras realizadas esta semana.</li>
+            <li>Ticket promedio aumentó un 12%.</li>
+          </ul>
+        </div>
+
+        <div class="inv-section">
+          <h3>💡 Oportunidades de venta</h3>
+          <ul>
+            <li>Ofrecer soporte GoPro.</li>
+            <li>Ofrecer logo LED.</li>
+            <li>Ofrecer base personalizada.</li>
+            <li>5 clientes compraron productos similares.</li>
+          </ul>
+        </div>
+
+        <div class="health-card">
+          <h2 class="health-title">👑 Cliente del mes</h2>
+          <p class="client-highlight">Leonardo Narváez</p>
+          <p>27 pedidos realizados.</p>
+          <p>$1.850.000 generados.</p>
+          <p>Probabilidad de recompra: 92%</p>
+        </div>
+
+        <div class="inv-section">
+          <h3>🏆 Top 5 clientes</h3>
+          <ul>
+            <li>#1 Leonardo Narváez</li>
+            <li>#2 Carlos Pérez</li>
+            <li>#3 Andrés Gómez</li>
+            <li>#4 María Rodríguez</li>
+            <li>#5 Juan López</li>
+          </ul>
+        </div>
+
+        <div class="inv-section">
+          <h3>⭐ Clientes VIP</h3>
+          <div class="stock-list" id="listaVip"></div>
+        </div>
+
+        <div class="inv-section">
+          <div class="admin-view-header">
+            <h3 style="margin: 0">👥 Todos los clientes</h3>
+            <a href="registrar-cliente.html" class="action primary add-btn">➕ Nuevo cliente</a>
+          </div>
+          <div class="stock-list" id="listaClientes"></div>
+        </div>
+
+        <div class="inv-section">
+          <h3>🔥 Clientes frecuentes</h3>
+          <ul>
+            <li>Compra cada 15 días.</li>
+            <li>Compra cada mes.</li>
+          </ul>
+        </div>
+
+        <div class="inv-section">
+          <h3>😴 Clientes inactivos</h3>
+          <ul>
+            <li>127 días sin comprar.</li>
+            <li>90 días sin comprar.</li>
+          </ul>
+        </div>
+
+        <div class="inv-section">
+          <h3>📦 Productos favoritos</h3>
+          <ul>
+            <li>Soporte Casco XTZ</li>
+            <li>Llaveros personalizados.</li>
+            <li>Logo LED.</li>
+            <li>Porta celular moto.</li>
+          </ul>
+        </div>
+      </main>
+    </div>
+
+    <button class="floating" aria-label="Agregar" onclick="window.location.href='registrar-cliente.html'">+</button>
+
+    <div class="bottom-nav mobile-only">
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span>Inicio</a>
+      <a href="inventario.html" class="nav-item"><span class="nav-icon">📦</span>Inventario</a>
+      <a href="produccion.html" class="nav-item"><span class="nav-icon">🖨️</span>Producción</a>
+      <a href="ventas.html" class="nav-item active"><span class="nav-icon">🧾</span>Ventas</a>
+    </div>
+
+    <!-- ===== Modal: Editar cliente ===== -->
+    <div class="modal-overlay" id="modalOverlayCliente">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3>Editar cliente</h3>
+          <button type="button" class="modal-close" onclick="cerrarModalCliente()">✕</button>
+        </div>
+        <form id="formEditarCliente">
+          <input type="hidden" id="editClienteId" />
+
+          <div class="input-group">
+            <label>Nombre completo</label>
+            <input type="text" id="editNombre" required />
+          </div>
+          <div class="input-group">
+            <label>Teléfono / WhatsApp</label>
+            <input type="tel" id="editTelefono" required />
+          </div>
+          <div class="input-group">
+            <label>Correo electrónico</label>
+            <input type="email" id="editCorreo" />
+          </div>
+          <div class="input-group">
+            <label>Ciudad</label>
+            <input type="text" id="editCiudad" />
+          </div>
+          <div class="input-group">
+            <label>Notas</label>
+            <textarea id="editNotas" rows="3"></textarea>
+          </div>
+
+          <label class="checkbox-inline">
+            <input type="checkbox" id="editVip" />
+            Cliente VIP
+          </label>
+
+          <div class="form-actions">
+            <button type="button" class="action" onclick="cerrarModalCliente()">Cancelar</button>
+            <button type="submit" class="action primary">Guardar cambios</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth-guard.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/clientes.js"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const autorizado = await verificarSesion();
+
+    if (!autorizado) {
+        return;
+    }
+
+});
+
+</script>
+
+  </body>
+</html>

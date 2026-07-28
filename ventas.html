@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ELROJO.3D - Ventas</title>
+  </head>
+  <body>
+    <div class="dashboard">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <img src="images/logo.png" alt="Elrojo.3d" class="logo-box" />
+          <div>
+            <div class="logo">@Elrojo.3d</div>
+            <div class="subtitle">Impresión 3D</div>
+          </div>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span>Inicio</a>
+          <a href="inventario.html" class="nav-item"><span class="nav-icon">📦</span>Inventario</a>
+          <a href="produccion.html" class="nav-item"><span class="nav-icon">🖨️</span>Producción</a>
+          <a href="ventas.html" class="nav-item active"><span class="nav-icon">🧾</span>Ventas</a>
+        </nav>
+
+        <div class="sidebar-user">
+          <div class="user-menu-wrapper">
+            <button class="user-menu-btn" onclick="toggleNotifications(this)">
+              <span class="user-avatar">👤</span>
+              <span class="user-info">
+                <span class="user-name">Leonardo Narváez</span>
+                <span class="user-role">Ver cuenta</span>
+              </span>
+              <span class="user-caret">⌄</span>
+            </button>
+            <div class="user-menu">
+              <a href="#" class="user-menu-item danger" onclick="cerrarSesionSupabase(); return false;">🚪 Cerrar sesión</a>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="content">
+        <div class="top">
+          <div class="top-brand mobile-only">
+            <img src="images/logo.png" alt="Elrojo.3d" class="top-logo" />
+            <div class="logo">@Elrojo.3d</div>
+          </div>
+          <div class="top-actions">
+            <div class="user-menu-wrapper">
+              <button class="icon-btn" aria-label="Perfil" onclick="toggleNotifications(this)">💼</button>
+              <div class="user-menu">
+                <a href="#" class="user-menu-item danger" onclick="cerrarSesionSupabase(); return false;">🚪 Cerrar sesión</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h1 class="page-title">Panel de ventas</h1>
+        <div class="description-left">Gestiona cotizaciones, pedidos y clientes.</div>
+
+        <div class="inv-cards">
+          <div class="inv-card">
+            <h4>Ventas del día</h4>
+            <div class="inv-value">$980K</div>
+          </div>
+          <div class="inv-card">
+            <h4>Pedidos nuevos</h4>
+            <div class="inv-value">8</div>
+          </div>
+          <div class="inv-card">
+            <h4>Meta mensual</h4>
+            <div class="inv-value">75%</div>
+          </div>
+          <div class="inv-card">
+            <h4>Clientes activos</h4>
+            <div class="inv-value">23</div>
+          </div>
+        </div>
+
+        <div class="inv-section">
+          <h3>Acciones rápidas</h3>
+          <div class="actions">
+            <a href="nueva-venta.html" class="action primary">🛒 Nueva venta</a>
+            <a href="cotizaciones.html" class="action">📝 Nueva cotización</a>
+            <a href="registrar-cliente.html" class="action">👥 Registrar cliente</a>
+            <div class="action">💳 Registrar pago</div>
+          </div>
+        </div>
+
+        <div class="inv-section">
+          <h3>Pedidos pendientes</h3>
+          <div class="list-item">
+            <span>Llavero personalizado</span><span class="badge badge-pending">Pendiente</span>
+          </div>
+          <div class="list-item">
+            <span>Soporte para casco</span><span class="badge badge-production">En producción</span>
+          </div>
+          <div class="list-item">
+            <span>Placa decorativa</span><span class="badge badge-unpaid">Por pagar</span>
+          </div>
+        </div>
+
+        <div class="inv-section">
+          <h3>Seguimiento de clientes</h3>
+          <div class="list-item"><span>Cotización enviada</span><span>5</span></div>
+          <div class="list-item"><span>Pagos recibidos</span><span>3</span></div>
+          <div class="list-item"><span>Entregas del día</span><span>2</span></div>
+        </div>
+
+        <div class="inv-section">
+          <h3>Productos más vendidos</h3>
+          <div class="list-item"><span>Soporte casco</span><span>18 uds.</span></div>
+          <div class="list-item"><span>Llaveros 3D</span><span>12 uds.</span></div>
+          <div class="list-item"><span>Porta celular moto</span><span>9 uds.</span></div>
+        </div>
+      </main>
+    </div>
+
+    <div class="bottom-nav mobile-only">
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span>Inicio</a>
+      <a href="inventario.html" class="nav-item"><span class="nav-icon">📦</span>Inventario</a>
+      <a href="produccion.html" class="nav-item"><span class="nav-icon">🖨️</span>Producción</a>
+      <a href="ventas.html" class="nav-item active"><span class="nav-icon">🧾</span>Ventas</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth-guard.js"></script>
+    <script src="js/main.js"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const autorizado = await verificarSesion();
+
+    if (!autorizado) {
+        return;
+    }
+
+});
+
+</script>
+
+  </body>
+</html>

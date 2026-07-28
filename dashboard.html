@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+    <title>ELROJO.3D - Dashboard</title>
+  </head>
+  <body>
+    <div class="dashboard">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <img src="images/logo.png" alt="Elrojo.3d" class="logo-box" />
+          <div>
+            <div class="logo">@Elrojo.3d</div>
+            <div class="subtitle">Impresión 3D</div>
+          </div>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="dashboard.html" class="nav-item active"><span class="nav-icon">🏠</span>Inicio</a>
+          <a href="inventario.html" class="nav-item"><span class="nav-icon">📦</span>Inventario</a>
+          <a href="produccion.html" class="nav-item"><span class="nav-icon">🖨️</span>Producción</a>
+          <a href="ventas.html" class="nav-item"><span class="nav-icon">🧾</span>Ventas</a>
+        </nav>
+
+        <div class="sidebar-user">
+          <div class="user-menu-wrapper">
+            <button class="user-menu-btn" onclick="toggleNotifications(this)">
+              <span class="user-avatar">👤</span>
+              <span class="user-info">
+                <span class="user-name">Leonardo Narváez</span>
+                <span class="user-role">Ver cuenta</span>
+              </span>
+              <span class="user-caret">⌄</span>
+            </button>
+            <div class="user-menu">
+              <a href="#" class="user-menu-item danger" onclick="cerrarSesionSupabase(); return false;">🚪 Cerrar sesión</a>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="content">
+        <div class="notif-bar">
+          <div class="notif-wrapper">
+            <button class="icon-btn" aria-label="Notificaciones" onclick="toggleNotifications(this)">
+              🔔<span class="notif-dot"></span>
+            </button>
+            <div class="notif-panel">
+              <div class="notif-panel-header">Actividad reciente</div>
+              <div class="notif-item">🛒 Nueva venta creada</div>
+              <div class="notif-item">🖨 Producción completada</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="top">
+          <div class="top-brand mobile-only">
+            <img src="images/logo.png" alt="Elrojo.3d" class="top-logo" />
+            <div>
+              <div class="logo">@Elrojo.3d</div>
+              <div class="subtitle">IMPRESIÓN 3D</div>
+            </div>
+          </div>
+          <div class="top-actions">
+            <button class="icon-btn" aria-label="Menú">☰</button>
+            <div class="user-menu-wrapper">
+              <button class="icon-btn" aria-label="Perfil" onclick="toggleNotifications(this)">👤</button>
+              <div class="user-menu">
+                <a href="#" class="user-menu-item danger" onclick="cerrarSesionSupabase(); return false;">🚪 Cerrar sesión</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="header">
+          <div>
+            <h1>¡Hola, Leonardo! 👋</h1>
+            <span class="muted">Bienvenido a tu panel de control</span>
+          </div>
+          <div class="date-box">
+            📅
+            <p><span id="fecha-actual"></span></p>
+          </div>
+        </div>
+
+        <div class="cards">
+          <div class="card">
+            <div class="card-title">
+              <div class="circle red">💰</div>
+              Ventas de hoy
+            </div>
+            <div class="value">$1.2M</div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <div class="circle orange">📋</div>
+              Pedidos
+            </div>
+            <div class="value">14</div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <div class="circle green">🖨️</div>
+              Producción
+            </div>
+            <div class="value">5</div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <div class="circle purple">📈</div>
+              Ganancia
+            </div>
+            <div class="value">$8.5M</div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <div class="circle yellow">⚠</div>
+              Inventario
+            </div>
+            <div class="value">7</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <a href="nueva-venta.html" class="action primary">🛒 Nueva venta</a>
+          <a href="pedidos.html" class="action">📋 Ver pedidos</a>
+          <div class="action">📦 Nueva producción</div>
+          <div class="action">📥 Agregar inventario</div>
+        </div>
+
+        <div class="panels">
+          <div class="chart">
+            <h3>Ventas - Últimos 30 días</h3>
+            <svg width="100%" height="80" viewBox="0 0 300 80" preserveAspectRatio="none">
+              <polyline
+                points="0,70 50,80 90,50 130,55 180,30 230,35 300,10"
+                fill="none"
+                stroke="#ff3131"
+                stroke-width="3"
+              />
+            </svg>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div class="bottom-nav mobile-only">
+      <a href="dashboard.html" class="nav-item active"><span class="nav-icon">🏠</span>Inicio</a>
+      <a href="inventario.html" class="nav-item"><span class="nav-icon">📦</span>Inventario</a>
+      <a href="produccion.html" class="nav-item"><span class="nav-icon">🖨️</span>Producción</a>
+      <a href="ventas.html" class="nav-item"><span class="nav-icon">🧾</span>Ventas</a>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/auth-guard.js"></script>
+<script src="js/main.js"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const autorizado = await verificarSesion();
+
+    if (!autorizado) {
+        return;
+    }
+
+});
+
+</script>
+
+  </body>
+</html>
