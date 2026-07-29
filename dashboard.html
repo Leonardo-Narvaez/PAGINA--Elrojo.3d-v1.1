@@ -52,8 +52,9 @@
             </button>
             <div class="notif-panel">
               <div class="notif-panel-header">Actividad reciente</div>
-              <div class="notif-item">🛒 Nueva venta creada</div>
-              <div class="notif-item">🖨 Producción completada</div>
+              <div id="notifDashboard">
+                <div class="notif-item">Cargando...</div>
+              </div>
             </div>
           </div>
         </div>
@@ -79,8 +80,8 @@
 
         <div class="header">
           <div>
-            <h1>¡Hola, Leonardo! 👋</h1>
-            <span class="muted">Bienvenido a tu panel de control</span>
+            <h1 id="saludoUsuario">¡Hola! 👋</h1>
+            <span class="muted" id="subtituloRol">Bienvenido a tu panel de control</span>
           </div>
           <div class="date-box">
             📅
@@ -89,40 +90,40 @@
         </div>
 
         <div class="cards">
-          <div class="card">
+          <div class="card" id="cardVentasHoy">
             <div class="card-title">
               <div class="circle red">💰</div>
               Ventas de hoy
             </div>
-            <div class="value">$1.2M</div>
+            <div class="value" id="statVentasHoy">$0</div>
           </div>
           <div class="card">
             <div class="card-title">
               <div class="circle orange">📋</div>
               Pedidos
             </div>
-            <div class="value">14</div>
+            <div class="value" id="statPedidos">0</div>
           </div>
           <div class="card">
             <div class="card-title">
               <div class="circle green">🖨️</div>
               Producción
             </div>
-            <div class="value">5</div>
+            <div class="value" id="statProduccion">0</div>
           </div>
-          <div class="card">
+          <div class="card" id="cardGanancia">
             <div class="card-title">
               <div class="circle purple">📈</div>
               Ganancia
             </div>
-            <div class="value">$8.5M</div>
+            <div class="value" id="statGanancia">$0</div>
           </div>
-          <div class="card">
+          <div class="card" id="cardInventario">
             <div class="card-title">
               <div class="circle yellow">⚠</div>
               Inventario
             </div>
-            <div class="value">7</div>
+            <div class="value" id="statInventario">0</div>
           </div>
         </div>
 
@@ -160,6 +161,8 @@
 <script src="js/supabase-config.js"></script>
 <script src="js/auth-guard.js"></script>
 <script src="js/main.js"></script>
+<script src="js/pedidos.js"></script>
+<script src="js/dashboard.js"></script>
 
 <script>
 
