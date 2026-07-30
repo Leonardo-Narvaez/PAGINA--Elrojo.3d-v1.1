@@ -67,18 +67,12 @@
         <form class="inv-section form-card" id="ventaForm">
           <div class="input-group">
             <label>Producto</label>
-            <select id="producto" required>
-              <option value="" disabled selected>Selecciona un producto</option>
-              <option>Placa Vehículos</option>
-              <option>Soporte Casco/Pared</option>
-              <option>Placas de mascotas</option>
-              <option>Llavero personalizado</option>
-              <option>Logo LED</option>
-              <option>Soporte GoPro</option>
-              <option>Porta celular moto</option>
-              <option>Base personalizada</option>
-              <option>Otro / personalizado</option>
-            </select>
+            <div class="combo-wrapper" id="comboProducto">
+              <input type="text" class="combo-input" id="productoBuscar" placeholder="Escribe para buscar un producto..." autocomplete="off" required />
+              <input type="hidden" id="productoId" />
+              <input type="hidden" id="productoPrecio" value="0" />
+              <div class="combo-dropdown" id="productoDropdown"></div>
+            </div>
           </div>
 
           <div class="input-group">
@@ -155,6 +149,7 @@
     <script src="js/supabase-config.js"></script>
     <script src="js/auth-guard.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/nueva-venta.js"></script>
 
 <script>
 

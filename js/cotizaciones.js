@@ -48,6 +48,7 @@ function formatoMoney(valor) {
 
 function plantillaProducto(idx, datos) {
   const d = datos || {};
+  const usaCatalogo = d.usaCatalogo || false;
   return `
     <div class="producto-item" data-idx="${idx}">
       <div class="producto-item-header">
@@ -58,7 +59,12 @@ function plantillaProducto(idx, datos) {
       <div class="form-row">
         <div class="input-group">
           <label>Nombre del producto</label>
-          <input type="text" class="prod-nombre" placeholder="Ej. Soporte Casco XTZ" value="${d.nombre || ""}" />
+          <div class="combo-wrapper combo-producto-cot" data-idx="${idx}">
+            <input type="text" class="prod-nombre combo-input" placeholder="Escribe para buscar o escribe uno nuevo..." autocomplete="off" value="${d.nombre || ""}" />
+            <input type="hidden" class="prod-catalogo-id" value="${d.catalogoId || ""}" />
+            <input type="hidden" class="prod-catalogo-precio" value="${d.catalogoPrecio || 0}" />
+            <div class="combo-dropdown"></div>
+          </div>
         </div>
         <div class="input-group">
           <label>Categoría</label>
@@ -103,6 +109,11 @@ function plantillaProducto(idx, datos) {
         <input type="number" class="prod-adicional" min="0" value="${d.adicional || 0}" />
       </div>
 
+      <div class="toggle-switch">
+        <input type="checkbox" class="prod-usa-catalogo" id="usaCatalogo${idx}" ${usaCatalogo ? "checked" : ""} />
+        <label for="usaCatalogo${idx}">Usar precio de catálogo en vez de calcular por costos</label>
+      </div>
+
       <div class="cost-breakdown" data-breakdown="${idx}"></div>
     </div>
   `;
@@ -143,6 +154,9 @@ function leerProductos() {
     const pesoUnitario = Number(item.querySelector(".prod-peso").value) || 0;
     const tiempoUnitario = Number(item.querySelector(".prod-tiempo").value) || 0;
     const adicional = Number(item.querySelector(".prod-adicional").value) || 0;
+    const usaCatalogo = item.querySelector(".prod-usa-catalogo").checked;
+    const catalogoId = item.querySelector(".prod-catalogo-id").value;
+    const catalogoPrecio = Number(item.querySelector(".prod-catalogo-precio").value) || 0;
 
     const gramosTotales = pesoUnitario * cantidad;
     const tiempoTotal = tiempoUnitario * cantidad;
@@ -157,9 +171,13 @@ function leerProductos() {
       costoFilamento + costoElectricidad + costoEmpaque + costoDesgaste + costoManoObra + adicional;
 
     const margenFraccion = Math.min(margenActual, 95) / 100;
-    const precioVentaTotal = margenFraccion < 1 ? costoBase / (1 - margenFraccion) : costoBase;
-    const comision = precioVentaTotal * (tarifas.comisionPct / 100);
-    const precioUnitario = cantidad > 0 ? precioVentaTotal / cantidad : precioVentaTotal;
+    const precioCalculadoTotal = margenFraccion < 1 ? costoBase / (1 - margenFraccion) : costoBase;
+    const comision = precioCalculadoTotal * (tarifas.comisionPct / 100);
+
+    // Si el interruptor "usar catálogo" está activo, el precio unitario
+    // sale directo de productos.precio_venta; si no, del cálculo por costos.
+    const precioUnitario = usaCatalogo ? catalogoPrecio : (cantidad > 0 ? precioCalculadoTotal / cantidad : precioCalculadoTotal);
+    const precioVentaTotal = precioUnitario * cantidad;
 
     productos.push({
       idx,
@@ -172,6 +190,9 @@ function leerProductos() {
       tiempo: tiempoUnitario,
       peso: pesoUnitario,
       adicional,
+      usaCatalogo,
+      catalogoId,
+      catalogoPrecio,
       gramosTotales,
       costoFilamento,
       costoElectricidad,
@@ -186,17 +207,26 @@ function leerProductos() {
 
     const breakdown = document.querySelector(`[data-breakdown="${idx}"]`);
     if (breakdown) {
-      breakdown.innerHTML = `
-        <div><span>Gramos utilizados</span><span>${gramosTotales} g</span></div>
-        <div><span>Costo filamento</span><span>${formatoMoney(costoFilamento)}</span></div>
-        <div><span>Costo electricidad</span><span>${formatoMoney(costoElectricidad)}</span></div>
-        <div><span>Costo empaques</span><span>${formatoMoney(costoEmpaque)}</span></div>
-        <div><span>Desgaste impresora</span><span>${formatoMoney(costoDesgaste)}</span></div>
-        <div><span>Mano de obra</span><span>${formatoMoney(costoManoObra)}</span></div>
-        <div><span>Costos adicionales</span><span>${formatoMoney(adicional)}</span></div>
-        <div><span>Comisión de venta (${tarifas.comisionPct}%)</span><span>${formatoMoney(comision)}</span></div>
-        <div class="cost-line-total"><span>Precio de venta (unitario)</span><span>${formatoMoney(precioUnitario)}</span></div>
-      `;
+      if (usaCatalogo) {
+        breakdown.innerHTML = `
+          <div class="catalogo-precio-info">
+            <span>💲 Precio de catálogo (unitario)</span>
+            <span>${formatoMoney(catalogoPrecio)}</span>
+          </div>
+        `;
+      } else {
+        breakdown.innerHTML = `
+          <div><span>Gramos utilizados</span><span>${gramosTotales} g</span></div>
+          <div><span>Costo filamento</span><span>${formatoMoney(costoFilamento)}</span></div>
+          <div><span>Costo electricidad</span><span>${formatoMoney(costoElectricidad)}</span></div>
+          <div><span>Costo empaques</span><span>${formatoMoney(costoEmpaque)}</span></div>
+          <div><span>Desgaste impresora</span><span>${formatoMoney(costoDesgaste)}</span></div>
+          <div><span>Mano de obra</span><span>${formatoMoney(costoManoObra)}</span></div>
+          <div><span>Costos adicionales</span><span>${formatoMoney(adicional)}</span></div>
+          <div><span>Comisión de venta (${tarifas.comisionPct}%)</span><span>${formatoMoney(comision)}</span></div>
+          <div class="cost-line-total"><span>Precio de venta (unitario)</span><span>${formatoMoney(precioUnitario)}</span></div>
+        `;
+      }
     }
   });
 
@@ -551,10 +581,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     year: "numeric",
   });
 
+  await cargarCatalogoCotizaciones();
   agregarProducto();
   renderCotizacionesGuardadas();
 
   document.getElementById("productosContainer").addEventListener("input", recalcularTodo);
+  document.getElementById("productosContainer").addEventListener("change", recalcularTodo);
   document
     .querySelectorAll("#cotCliente, #cotWhatsapp, #cotCiudad, #tarifaFilamento, #tarifaElectricidad, #tarifaEmpaque, #tarifaDesgaste, #tarifaManoObra, #tarifaComision")
     .forEach((el) => el.addEventListener("input", recalcularTodo));
@@ -567,4 +599,101 @@ document.addEventListener("DOMContentLoaded", async () => {
     margenActual = Number(e.target.value) || 0;
     recalcularTodo();
   });
+
+  // ===== Buscador de producto (delegado, porque las filas se crean dinámicamente) =====
+  document.getElementById("productosContainer").addEventListener("focusin", (event) => {
+    const input = event.target.closest(".combo-producto-cot .combo-input");
+    if (input) renderDropdownProductoCot(input);
+  });
+
+  document.getElementById("productosContainer").addEventListener("input", (event) => {
+    const input = event.target.closest(".combo-producto-cot .combo-input");
+    if (!input) return;
+    const wrapper = input.closest(".combo-producto-cot");
+    wrapper.querySelector(".prod-catalogo-id").value = "";
+    wrapper.querySelector(".prod-catalogo-precio").value = 0;
+    renderDropdownProductoCot(input);
+  });
+
+  document.getElementById("productosContainer").addEventListener("click", (event) => {
+    const item = event.target.closest(".combo-item");
+    if (item) {
+      const wrapper = item.closest(".combo-producto-cot");
+      seleccionarProductoCot(wrapper, item.dataset.id);
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest(".combo-producto-cot")) {
+      document.querySelectorAll(".combo-producto-cot .combo-dropdown").forEach((d) => d.classList.remove("open"));
+    }
+  });
 });
+
+// ===== Catálogo de productos (buscador) =====
+
+let catalogoProductosCot = [];
+
+async function cargarCatalogoCotizaciones() {
+  if (typeof supabaseClient === "undefined" || !supabaseClient) return;
+
+  const { data, error } = await supabaseClient
+    .from("productos")
+    .select("id, nombre, precio_venta, activo, categorias_productos(nombre)")
+    .eq("activo", true)
+    .order("nombre");
+
+  if (error) {
+    console.error("No se pudo cargar el catálogo de productos:", error.message);
+    return;
+  }
+  catalogoProductosCot = data || [];
+}
+
+function renderDropdownProductoCot(input) {
+  const wrapper = input.closest(".combo-producto-cot");
+  const dropdown = wrapper.querySelector(".combo-dropdown");
+  const texto = input.value.toLowerCase().trim();
+
+  const coincidencias = texto
+    ? catalogoProductosCot.filter((p) => p.nombre.toLowerCase().includes(texto))
+    : catalogoProductosCot;
+
+  if (coincidencias.length === 0) {
+    dropdown.innerHTML = `<div class="combo-empty">No se encontraron productos. Puedes escribir uno nuevo.</div>`;
+  } else {
+    dropdown.innerHTML = coincidencias
+      .map(
+        (p) => `
+          <div class="combo-item" data-id="${p.id}">
+            <div class="combo-item-nombre">${p.nombre}</div>
+            <div class="combo-item-meta">${p.categorias_productos ? p.categorias_productos.nombre + " · " : ""}${formatoMoney(p.precio_venta)}</div>
+          </div>
+        `
+      )
+      .join("");
+  }
+
+  dropdown.classList.add("open");
+}
+
+function seleccionarProductoCot(wrapper, id) {
+  const producto = catalogoProductosCot.find((p) => p.id === id);
+  if (!producto) return;
+
+  const item = wrapper.closest(".producto-item");
+  wrapper.querySelector(".prod-nombre").value = producto.nombre;
+  wrapper.querySelector(".prod-catalogo-id").value = producto.id;
+  wrapper.querySelector(".prod-catalogo-precio").value = producto.precio_venta || 0;
+  wrapper.querySelector(".combo-dropdown").classList.remove("open");
+
+  if (producto.categorias_productos) {
+    item.querySelector(".prod-categoria").value = producto.categorias_productos.nombre;
+  }
+
+  // Al elegir del catálogo, se activa por defecto el precio de catálogo
+  // (se puede apagar el interruptor si este pedido necesita un ajuste).
+  item.querySelector(".prod-usa-catalogo").checked = true;
+
+  recalcularTodo();
+}
