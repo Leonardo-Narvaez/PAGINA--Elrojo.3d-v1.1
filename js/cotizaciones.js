@@ -295,6 +295,7 @@ function recolectarCotizacionActual() {
   return {
     folio: document.getElementById("quoteFolio").textContent,
     cliente: document.getElementById("cotCliente").value.trim(),
+    cliente_id: document.getElementById("cotClienteId").value || null,
     whatsapp: document.getElementById("cotWhatsapp").value.trim(),
     correo: document.getElementById("cotCorreo").value.trim(),
     ciudad: document.getElementById("cotCiudad").value.trim(),
@@ -380,6 +381,7 @@ function cargarCotizacionEnFormulario(id) {
   cotizacionEditandoId = cot.id;
   document.getElementById("quoteFolio").textContent = cot.folio;
   document.getElementById("cotCliente").value = cot.cliente || "";
+  document.getElementById("cotClienteId").value = cot.cliente_id || "";
   document.getElementById("cotWhatsapp").value = cot.whatsapp || "";
   document.getElementById("cotCorreo").value = cot.correo || "";
   document.getElementById("cotCiudad").value = cot.ciudad || "";
@@ -628,6 +630,62 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.querySelectorAll(".combo-producto-cot .combo-dropdown").forEach((d) => d.classList.remove("open"));
     }
   });
+
+  // ===== Buscador de cliente =====
+  clientesDisponiblesCot = await cargarClientesCotizaciones();
+  const clienteInputCot = document.getElementById("cotCliente");
+
+  clienteInputCot.addEventListener("focus", () => renderDropdownClienteCot(clienteInputCot.value));
+  clienteInputCot.addEventListener("input", () => {
+    document.getElementById("cotClienteId").value = "";
+    renderDropdownClienteCot(clienteInputCot.value);
+  });
+
+  document.getElementById("cotClienteDropdown").addEventListener("click", (event) => {
+    if (event.target.id === "btnRegistrarClienteRapidoCot") {
+      abrirModalClienteRapidoCot();
+      return;
+    }
+    const item = event.target.closest(".combo-item");
+    if (item) seleccionarClienteCot(item.dataset.id);
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest("#comboClienteCot")) {
+      document.getElementById("cotClienteDropdown").classList.remove("open");
+    }
+  });
+
+  document.getElementById("modalOverlayClienteRapido").addEventListener("click", (event) => {
+    if (event.target === event.currentTarget) cerrarModalClienteRapidoCot();
+  });
+
+  document.getElementById("formClienteRapidoCot").addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const nuevoCliente = {
+      nombre: document.getElementById("rapidoCotNombre").value.trim(),
+      telefono: document.getElementById("rapidoCotTelefono").value.trim(),
+      correo: document.getElementById("rapidoCotCorreo").value.trim(),
+      ciudad: document.getElementById("rapidoCotCiudad").value.trim(),
+    };
+
+    if (!nuevoCliente.nombre || !nuevoCliente.telefono) {
+      alert("Por favor completa al menos el nombre y el teléfono.");
+      return;
+    }
+
+    const { data, error } = await supabaseClient.from("clientes").insert(nuevoCliente).select().single();
+
+    if (error) {
+      alert("No se pudo registrar el cliente: " + error.message);
+      return;
+    }
+
+    clientesDisponiblesCot.push(data);
+    seleccionarClienteCot(data.id);
+    cerrarModalClienteRapidoCot();
+  });
 });
 
 // ===== Catálogo de productos (buscador) =====
@@ -696,4 +754,76 @@ function seleccionarProductoCot(wrapper, id) {
   item.querySelector(".prod-usa-catalogo").checked = true;
 
   recalcularTodo();
+}
+
+// ===== Buscador de cliente (cotizaciones) =====
+
+let clientesDisponiblesCot = [];
+
+async function cargarClientesCotizaciones() {
+  if (typeof supabaseClient === "undefined" || !supabaseClient) return [];
+
+  const { data, error } = await supabaseClient
+    .from("clientes")
+    .select("id, nombre, telefono, correo, ciudad")
+    .order("nombre");
+
+  if (error) {
+    console.error("No se pudo cargar la lista de clientes:", error.message);
+    return [];
+  }
+  return data;
+}
+
+function renderDropdownClienteCot(filtro) {
+  const dropdown = document.getElementById("cotClienteDropdown");
+  const texto = (filtro || "").toLowerCase().trim();
+
+  const coincidencias = texto
+    ? clientesDisponiblesCot.filter(
+        (c) => c.nombre.toLowerCase().includes(texto) || (c.telefono || "").includes(texto)
+      )
+    : clientesDisponiblesCot;
+
+  let html = coincidencias
+    .map(
+      (c) => `
+        <div class="combo-item" data-id="${c.id}">
+          <div class="combo-item-nombre">${c.nombre}</div>
+          <div class="combo-item-meta">${[c.telefono, c.ciudad].filter(Boolean).join(" · ") || "Sin datos"}</div>
+        </div>
+      `
+    )
+    .join("");
+
+  if (coincidencias.length === 0) {
+    html += `<div class="combo-empty">No se encontraron clientes.</div>`;
+  }
+  html += `<div class="combo-item-action" id="btnRegistrarClienteRapidoCot">➕ Registrar nuevo cliente</div>`;
+
+  dropdown.innerHTML = html;
+  dropdown.classList.add("open");
+}
+
+function seleccionarClienteCot(id) {
+  const cliente = clientesDisponiblesCot.find((c) => c.id === id);
+  if (!cliente) return;
+
+  document.getElementById("cotCliente").value = cliente.nombre;
+  document.getElementById("cotClienteId").value = cliente.id;
+  if (cliente.telefono) document.getElementById("cotWhatsapp").value = cliente.telefono;
+  if (cliente.ciudad) document.getElementById("cotCiudad").value = cliente.ciudad;
+  document.getElementById("cotClienteDropdown").classList.remove("open");
+  recalcularTodo();
+}
+
+function abrirModalClienteRapidoCot() {
+  document.getElementById("cotClienteDropdown").classList.remove("open");
+  document.getElementById("formClienteRapidoCot").reset();
+  document.getElementById("rapidoCotNombre").value = document.getElementById("cotCliente").value.trim();
+  document.getElementById("modalOverlayClienteRapido").classList.add("open");
+}
+
+function cerrarModalClienteRapidoCot() {
+  document.getElementById("modalOverlayClienteRapido").classList.remove("open");
 }

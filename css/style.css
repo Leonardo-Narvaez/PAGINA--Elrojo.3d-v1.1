@@ -2452,3 +2452,21 @@ body {
   display: flex;
   justify-content: space-between;
 }
+
+/* ============================= */
+/* ===== Buscador de cliente ===== */
+/* ============================= */
+
+.combo-item-action {
+  padding: 12px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: #e63946;
+  text-align: center;
+  transition: background 0.15s ease;
+}
+
+.combo-item-action:hover {
+  background: #2a2a2a;
+}
