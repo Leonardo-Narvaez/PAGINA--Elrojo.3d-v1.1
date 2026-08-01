@@ -68,16 +68,29 @@ async function inicializarDashboard() {
     const desdeHoy = inicioDelDia();
     const desdeMes = inicioDelMes();
 
-    const ventasHoy = pedidos
+    const ventasHoyPedidos = pedidos
       .filter((p) => p.estado_pago === "Pagado" && new Date(p.created_at) >= desdeHoy)
       .reduce((sum, p) => sum + (Number(p.precio_unitario) || 0) * (Number(p.cantidad) || 0), 0);
 
-    const gananciaMes = pedidos
+    const gananciaMesPedidos = pedidos
       .filter((p) => p.estado_pago === "Pagado" && new Date(p.created_at) >= desdeMes)
       .reduce((sum, p) => sum + (Number(p.precio_unitario) || 0) * (Number(p.cantidad) || 0), 0);
 
-    document.getElementById("statVentasHoy").textContent = formatoMoney(ventasHoy);
-    document.getElementById("statGanancia").textContent = formatoMoney(gananciaMes);
+    // Los "otros ingresos" solo los puede leer Administrador (RLS); si el
+    // rol actual es Ventas, esta consulta devuelve vacío/error y se suma 0.
+    const { data: otrosIngresos } = await supabaseClient.from("ingresos_otros").select("monto, fecha");
+    const listaOtros = otrosIngresos || [];
+
+    const otrosHoy = listaOtros
+      .filter((i) => new Date(i.fecha) >= desdeHoy)
+      .reduce((sum, i) => sum + (Number(i.monto) || 0), 0);
+
+    const otrosMes = listaOtros
+      .filter((i) => new Date(i.fecha) >= desdeMes)
+      .reduce((sum, i) => sum + (Number(i.monto) || 0), 0);
+
+    document.getElementById("statVentasHoy").textContent = formatoMoney(ventasHoyPedidos + otrosHoy);
+    document.getElementById("statGanancia").textContent = formatoMoney(gananciaMesPedidos + otrosMes);
   } else {
     // Producción no ve cifras de dinero: se ocultan las tarjetas (no se borran).
     if (cardVentas) cardVentas.style.display = "none";

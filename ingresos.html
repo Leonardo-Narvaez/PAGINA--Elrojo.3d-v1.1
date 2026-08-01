@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="css/style.css">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ELROJO.3D - Ventas</title>
+    <title>ELROJO.3D - Ingresos</title>
   </head>
   <body>
     <div class="dashboard">
@@ -44,11 +44,15 @@
         <div class="top">
           <div class="top-brand mobile-only">
             <img src="images/logo.png" alt="Elrojo.3d" class="top-logo" />
-            <div class="logo">@Elrojo.3d</div>
+            <div>
+              <div class="logo">@Elrojo.3d</div>
+              <div class="subtitle">Ingresos</div>
+            </div>
           </div>
+
           <div class="top-actions">
             <div class="user-menu-wrapper">
-              <button class="icon-btn" aria-label="Perfil" onclick="toggleNotifications(this)">💼</button>
+              <button class="icon-btn" aria-label="Perfil" onclick="toggleNotifications(this)">👤</button>
               <div class="user-menu">
                 <a href="#" class="user-menu-item danger" onclick="cerrarSesionSupabase(); return false;">🚪 Cerrar sesión</a>
               </div>
@@ -56,64 +60,71 @@
           </div>
         </div>
 
-        <h1 class="page-title">Panel de ventas</h1>
-        <div class="description-left">Gestiona cotizaciones, pedidos y clientes.</div>
+        <a href="ventas.html" class="back-link desktop-only">← Volver a Ventas</a>
+        <h1 class="page-title">Ingresos</h1>
+        <div class="description-left">Registra ingresos que no vienen de un pedido (ventas directas, servicios, etc.).</div>
 
-        <div class="inv-cards">
-          <div class="inv-card">
-            <h4>Ventas del día</h4>
-            <div class="inv-value">$980K</div>
-          </div>
-          <div class="inv-card">
-            <h4>Pedidos nuevos</h4>
-            <div class="inv-value">8</div>
-          </div>
-          <div class="inv-card">
-            <h4>Meta mensual</h4>
-            <div class="inv-value">75%</div>
-          </div>
-          <div class="inv-card">
-            <h4>Clientes activos</h4>
-            <div class="inv-value">23</div>
-          </div>
-        </div>
+        <!-- ===== Registrar ingreso (Administrador y Ventas) ===== -->
+        <form class="inv-section form-card" id="formIngreso">
+          <h3>Nuevo ingreso</h3>
 
-        <div class="inv-section">
-          <h3>Acciones rápidas</h3>
-          <div class="actions">
-            <a href="nueva-venta.html" class="action primary">🛒 Nueva venta</a>
-            <a href="cotizaciones.html" class="action">📝 Nueva cotización</a>
-            <a href="registrar-cliente.html" class="action">👥 Registrar cliente</a>
-            <a href="ingresos.html" class="action">💰 Ingresos</a>
+          <div class="input-group">
+            <label>Concepto</label>
+            <input type="text" id="ingresoConcepto" placeholder="Ej. Venta directa en feria" required />
           </div>
-        </div>
 
-        <div class="inv-section">
-          <h3>Pedidos pendientes</h3>
-          <div class="list-item">
-            <span>Llavero personalizado</span><span class="badge badge-pending">Pendiente</span>
+          <div class="form-row">
+            <div class="input-group">
+              <label>Monto</label>
+              <input type="number" id="ingresoMonto" min="0" placeholder="50000" required />
+            </div>
+            <div class="input-group">
+              <label>Fecha</label>
+              <input type="date" id="ingresoFecha" required />
+            </div>
           </div>
-          <div class="list-item">
-            <span>Soporte para casco</span><span class="badge badge-production">En producción</span>
-          </div>
-          <div class="list-item">
-            <span>Placa decorativa</span><span class="badge badge-unpaid">Por pagar</span>
-          </div>
-        </div>
 
-        <div class="inv-section">
-          <h3>Seguimiento de clientes</h3>
-          <div class="list-item"><span>Cotización enviada</span><span>5</span></div>
-          <div class="list-item"><span>Pagos recibidos</span><span>3</span></div>
-          <div class="list-item"><span>Entregas del día</span><span>2</span></div>
-        </div>
+          <div class="input-group">
+            <label>Método de pago</label>
+            <select id="ingresoMetodoPago">
+              <option>Efectivo</option>
+              <option>Transferencia</option>
+              <option>Otro</option>
+            </select>
+          </div>
 
-        <div class="inv-section">
-          <h3>Productos más vendidos</h3>
-          <div class="list-item"><span>Soporte casco</span><span>18 uds.</span></div>
-          <div class="list-item"><span>Llaveros 3D</span><span>12 uds.</span></div>
-          <div class="list-item"><span>Porta celular moto</span><span>9 uds.</span></div>
-        </div>
+          <div class="input-group">
+            <label>Notas (opcional)</label>
+            <textarea id="ingresoNotas" rows="2" placeholder="Detalles adicionales..."></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="action primary">💾 Registrar ingreso</button>
+          </div>
+        </form>
+
+        <!-- ===== Reporte (solo Administrador) ===== -->
+        <section id="reporteIngresos" style="display: none">
+          <div class="inv-cards">
+            <div class="inv-card">
+              <h4>Total registrado</h4>
+              <div class="inv-value" id="totalIngresos">$0</div>
+            </div>
+            <div class="inv-card">
+              <h4>Este mes</h4>
+              <div class="inv-value" id="totalIngresosMes">$0</div>
+            </div>
+            <div class="inv-card">
+              <h4>Cantidad de registros</h4>
+              <div class="inv-value" id="countIngresos">0</div>
+            </div>
+          </div>
+
+          <div class="inv-section">
+            <h3>Historial</h3>
+            <div class="stock-list" id="listaIngresos"></div>
+          </div>
+        </section>
       </main>
     </div>
 
@@ -128,6 +139,7 @@
     <script src="js/supabase-config.js"></script>
     <script src="js/auth-guard.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/ingresos.js"></script>
 
 <script>
 

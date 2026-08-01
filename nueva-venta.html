@@ -155,9 +155,7 @@
     <script src="js/main.js"></script>
     <script src="js/nueva-venta.js"></script>
 
-<script>
 
-document.addEventListener("DOMContentLoaded", async () => {
     <!-- ===== Modal: Registrar cliente rápido (sin salir de la venta) ===== -->
     <div class="modal-overlay" id="modalOverlayClienteRapido">
       <div class="modal-box">
@@ -168,19 +166,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         <form id="formClienteRapido">
           <div class="input-group">
             <label>Nombre completo</label>
-            <input type="text" id="rapidoNombre" required />
+            <input type="text" id="rapidoNombre" placeholder="Ej. Leonardo Narváez" required />
           </div>
           <div class="input-group">
             <label>Teléfono / WhatsApp</label>
-            <input type="tel" id="rapidoTelefono" required />
+            <input type="tel" id="rapidoTelefono"placeholder="Ej. 300 123 4567" required />
           </div>
           <div class="input-group">
             <label>Correo (opcional)</label>
-            <input type="email" id="rapidoCorreo" />
+            <input type="email" id="rapidoCorreo" placeholder="cliente@correo.com" />
           </div>
           <div class="input-group">
             <label>Ciudad (opcional)</label>
-            <input type="text" id="rapidoCiudad" />
+            <input type="text" id="rapidoCiudad" placeholder="Ej. Medellín" />
           </div>
 
           <div class="form-actions">
@@ -190,8 +188,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         </form>
       </div>
     </div>
-
-<script>
+  
 
 document.addEventListener("DOMContentLoaded", async () => {
 
