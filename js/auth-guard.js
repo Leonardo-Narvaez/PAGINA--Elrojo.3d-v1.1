@@ -83,7 +83,7 @@ async function verificarRol(rolesPermitidos = []) {
     // CONSULTAR TU TABLA USUARIOS
     const { data, error } = await supabaseClient
         .from("usuarios")
-        .select("rol")
+        .select("rol, estado, nombre, apellido")
         .eq("id", usuario.id)
         .single();
 
@@ -91,6 +91,21 @@ async function verificarRol(rolesPermitidos = []) {
 
         console.error(error);
         alert("Tu cuenta todavía no tiene un rol asignado. Contacta al administrador.");
+        window.location.href = "index.html";
+        return;
+
+    }
+
+    // Muestra el nombre y el rol reales en el sidebar/menú de usuario de
+    // cualquier página que tenga estos elementos (todas las internas).
+    mostrarUsuarioEnPantalla(data);
+
+
+    // SI LA CUENTA NO ESTÁ ACTIVA, CIERRA LA SESIÓN DE INMEDIATO
+    if (data.estado !== "activo") {
+
+        alert(`Tu cuenta está ${data.estado}. Contacta al administrador.`);
+        await supabaseClient.auth.signOut();
         window.location.href = "index.html";
         return;
 
@@ -108,5 +123,23 @@ async function verificarRol(rolesPermitidos = []) {
     }
 
     return data.rol;
+}
+
+
+// Actualiza el nombre y el rol reales en el sidebar/menú de usuario
+// (mismo bloque .user-name / .user-role que ya existe en todas las
+// páginas, tanto en el sidebar de escritorio como en el menú móvil).
+function mostrarUsuarioEnPantalla(usuario) {
+
+    const nombreCompleto = [usuario.nombre, usuario.apellido].filter(Boolean).join(" ") || "Usuario";
+
+    document.querySelectorAll(".user-name").forEach((el) => {
+        el.textContent = nombreCompleto;
+    });
+
+    document.querySelectorAll(".user-role").forEach((el) => {
+        el.textContent = usuario.rol;
+    });
+
 }
 
