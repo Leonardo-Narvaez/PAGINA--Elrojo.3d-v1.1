@@ -4,6 +4,40 @@
 
 
 // Verifica si existe una sesión activa
+const PERFIL_VISUAL_KEY = "elrojo3d.perfilVisual";
+
+function guardarPerfilVisual(usuario) {
+    const perfil = { nombre: usuario.nombre || "", apellido: usuario.apellido || "", rol: usuario.rol || "" };
+    sessionStorage.setItem(PERFIL_VISUAL_KEY, JSON.stringify(perfil));
+}
+
+function obtenerPerfilVisual() {
+    try {
+        const perfil = JSON.parse(sessionStorage.getItem(PERFIL_VISUAL_KEY));
+        return perfil && perfil.rol ? perfil : null;
+    } catch (error) {
+        sessionStorage.removeItem(PERFIL_VISUAL_KEY);
+        return null;
+    }
+}
+
+function limpiarPerfilVisual() {
+    sessionStorage.removeItem(PERFIL_VISUAL_KEY);
+}
+
+function mostrarInterfazAutenticada(usuario) {
+    mostrarUsuarioEnPantalla(usuario);
+    configurarMenuAdministrador(usuario.rol);
+    document.documentElement.classList.add("auth-ui-ready");
+}
+
+function hidratarInterfazDesdeCache() {
+    const perfil = obtenerPerfilVisual();
+    if (perfil && document.querySelector(".sidebar, .bottom-nav")) {
+        mostrarInterfazAutenticada(perfil);
+    }
+}
+
 async function verificarSesion() {
 
     const { data, error } = await supabaseClient.auth.getSession();
@@ -15,6 +49,7 @@ async function verificarSesion() {
     }
 
     if (!data.session) {
+        limpiarPerfilVisual();
         window.location.href = "index.html";
         return;
     }
@@ -29,6 +64,7 @@ async function obtenerUsuario() {
     const { data, error } = await supabaseClient.auth.getUser();
 
     if (error || !data.user) {
+        limpiarPerfilVisual();
         window.location.href = "index.html";
         return null;
     }
@@ -41,6 +77,7 @@ async function obtenerUsuario() {
 async function cerrarSesionSupabase() {
 
     try {
+        limpiarPerfilVisual();
 
         const { error } = await supabaseClient.auth.signOut();
 
@@ -65,6 +102,7 @@ async function cerrarSesionSupabase() {
 supabaseClient.auth.onAuthStateChange((event) => {
 
     if (event === "SIGNED_OUT") {
+        limpiarPerfilVisual();
 
         window.location.replace("index.html");
 
@@ -98,7 +136,6 @@ async function verificarRol(rolesPermitidos = []) {
 
     // Muestra el nombre y el rol reales en el sidebar/menú de usuario de
     // cualquier página que tenga estos elementos (todas las internas).
-    mostrarUsuarioEnPantalla(data);
 
 
     // SI LA CUENTA NO ESTÁ ACTIVA, CIERRA LA SESIÓN DE INMEDIATO
@@ -110,6 +147,9 @@ async function verificarRol(rolesPermitidos = []) {
         return;
 
     }
+
+    guardarPerfilVisual(data);
+    mostrarInterfazAutenticada(data);
 
 
     // SI EL ROL NO ESTÁ PERMITIDO (Administrador siempre tiene acceso total)
@@ -142,4 +182,43 @@ function mostrarUsuarioEnPantalla(usuario) {
     });
 
 }
+
+
+// Agrega el acceso a Administrador en cada navegación interna y lo muestra
+// únicamente a las cuentas administradoras. La validación de rutas continúa
+// en verificarRol(), por lo que ocultar el enlace no sustituye los permisos.
+function configurarMenuAdministrador(rol) {
+
+    const esAdministrador = rol === "Administrador";
+    const paginasAdministrativas = [
+        "administrador.html",
+        "gestion-inventario.html",
+        "reportes.html",
+        "auditoria.html"
+    ];
+    const paginaActual = window.location.pathname.split("/").pop() || "dashboard.html";
+    const enModuloAdministrador = paginasAdministrativas.includes(paginaActual);
+
+    document.querySelectorAll(".sidebar-nav, .bottom-nav").forEach((menu) => {
+        let enlace = [...menu.querySelectorAll("a.nav-item")]
+            .find((item) => item.getAttribute("href") === "administrador.html");
+
+        if (!enlace) {
+            enlace = document.createElement("a");
+            enlace.href = "administrador.html";
+            enlace.className = "nav-item admin-menu-link";
+            enlace.innerHTML = '<span class="nav-icon">👑</span>' +
+                (menu.classList.contains("bottom-nav") ? "Admin" : "Administrador");
+            menu.appendChild(enlace);
+        }
+
+        enlace.classList.add("admin-menu-link");
+        enlace.classList.toggle("admin-menu-visible", esAdministrador);
+        enlace.classList.toggle("active", esAdministrador && enModuloAdministrador);
+    });
+}
+
+// Muestra el perfil de la sesión anterior mientras Supabase confirma los
+// datos y permisos reales de la cuenta actual.
+hidratarInterfazDesdeCache();
 

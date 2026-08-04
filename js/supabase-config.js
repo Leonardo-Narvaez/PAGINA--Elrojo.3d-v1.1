@@ -31,6 +31,27 @@ async function loginConSupabase(email, password) {
     return;
   }
 
+  // Guarda el perfil visual antes de redirigir. No se usa para autorizar;
+  // verificarRol() lo confirma nuevamente con Supabase en cada página.
+  if (typeof guardarPerfilVisual === "function" && data.user) {
+    const { data: perfil } = await supabaseClient
+      .from("usuarios")
+      .select("rol, nombre, apellido")
+      .eq("id", data.user.id)
+      .single();
+
+    if (perfil) {
+      guardarPerfilVisual(perfil);
+    }
+  }
+
+  // Registra un evento de acceso en el servidor. Si falla, el inicio de
+  // sesión ya fue validado por Supabase y no debe impedir el acceso.
+  const { error: errorAuditoria } = await supabaseClient.rpc("registrar_inicio_sesion");
+  if (errorAuditoria) {
+    console.warn("No se pudo registrar el inicio de sesión:", errorAuditoria.message);
+  }
+
   window.location.href = "dashboard.html";
 }
 
