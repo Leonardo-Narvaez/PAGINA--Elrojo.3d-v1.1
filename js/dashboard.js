@@ -53,13 +53,21 @@ async function inicializarDashboard() {
     document.getElementById("subtituloRol").textContent = `Bienvenido a tu panel de control · ${usuario.rol}`;
   }
 
+  await refrescarDatosDashboard();
+
+  // ===== Actividad reciente (campana) =====
+  iniciarNotificacionesCampana();
+}
+
+async function refrescarDatosDashboard() {
+  const usuario = await cargarRolActual();
   const pedidos = await cargarPedidos();
 
   // ===== Pedidos y Producción (visibles para todos los roles) =====
-  document.getElementById("statPedidos").textContent = pedidos.length;
+  document.getElementById("statPedidos").textContent = pedidos.filter((p) => p.estado !== "Entregado").length;
   document.getElementById("statProduccion").textContent = pedidos.filter((p) => p.estado === "En producción").length;
 
-  // ===== Ventas de hoy y Ganancia del mes (solo Administrador y Ventas) =====
+  // ===== Ventas de hoy e Ingresos del mes (solo Administrador y Ventas) =====
   const esVentasOAdmin = usuario && (usuario.rol === "Administrador" || usuario.rol === "Ventas");
   const cardVentas = document.getElementById("cardVentasHoy");
   const cardGanancia = document.getElementById("cardGanancia");
@@ -108,8 +116,62 @@ async function inicializarDashboard() {
     cardInventario.style.display = "none";
   }
 
-  // ===== Actividad reciente (campana) =====
-  iniciarNotificacionesCampana();
+  // ===== Gráfico de ventas (últimos 30 días) =====
+  renderGraficoVentas(pedidos);
+
+  // ===== Campana (si ya estaba iniciada, se actualiza) =====
+  cargarNotificacionesPendientes();
+}
+
+function renderGraficoVentas(pedidos) {
+  const linea = document.getElementById("lineaVentas");
+  const etiquetas = document.getElementById("etiquetasVentas");
+  if (!linea) return;
+
+  const ANCHO = 300;
+  const ALTO = 120;
+  const MARGEN = 8;
+  const DIAS = 30;
+
+  const hoy = new Date();
+  const porDia = new Array(DIAS).fill(0);
+  const hace30 = new Date(hoy);
+  hace30.setDate(hoy.getDate() - (DIAS - 1));
+  hace30.setHours(0, 0, 0, 0);
+
+  (pedidos || [])
+    .filter((p) => p.estado_pago === "Pagado")
+    .forEach((p) => {
+      const fecha = new Date(p.created_at);
+      if (fecha < hace30) return;
+      const diffDias = Math.floor((fecha - hace30) / 86400000);
+      if (diffDias >= 0 && diffDias < DIAS) {
+        porDia[diffDias] += (Number(p.precio_unitario) || 0) * (Number(p.cantidad) || 0);
+      }
+    });
+
+  const maximo = Math.max(...porDia, 1);
+
+  const puntos = porDia
+    .map((valor, i) => {
+      const x = MARGEN + (i * (ANCHO - MARGEN * 2)) / (DIAS - 1);
+      const y = ALTO - MARGEN - (valor / maximo) * (ALTO - MARGEN * 2);
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(" ");
+
+  linea.setAttribute("points", puntos);
+  linea.style.display = porDia.every((v) => v === 0) ? "none" : "";
+
+  if (etiquetas) {
+    const inicioLabel = hace30.toLocaleDateString("es-CO", { day: "numeric", month: "short" });
+    const finLabel = hoy.toLocaleDateString("es-CO", { day: "numeric", month: "short" });
+    etiquetas.innerHTML = `
+      <span>${inicioLabel}</span>
+      <span>${formatoMoney(maximo)}</span>
+      <span>${finLabel}</span>
+    `;
+  }
 }
 
 let canalNotificacionesCampana = null;
@@ -286,4 +348,11 @@ function crearContenedorToast() {
 document.addEventListener("DOMContentLoaded", () => {
   if (!document.getElementById("statPedidos")) return;
   inicializarDashboard();
+});
+
+// Al volver a la pestaña, se refrescan las tarjetas, el gráfico y la campana.
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && document.getElementById("statPedidos")) {
+    refrescarDatosDashboard();
+  }
 });

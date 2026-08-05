@@ -1312,6 +1312,15 @@ body {
   margin-top: 2px;
 }
 
+.chart-labels {
+  display: flex;
+  justify-content: space-between;
+  color: #8a8a8a;
+  font-size: 12px;
+  margin-top: 6px;
+  padding: 0 4px;
+}
+
 @keyframes toast-in {
   from {
     opacity: 0;

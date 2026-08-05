@@ -97,10 +97,10 @@
             </div>
             <div class="value" id="statVentasHoy">$0</div>
           </div>
-          <div class="card">
+          <div class="card" id="cardPedidos">
             <div class="card-title">
               <div class="circle orange">📋</div>
-              Pedidos
+              Pedidos activos
             </div>
             <div class="value" id="statPedidos">0</div>
           </div>
@@ -114,7 +114,7 @@
           <div class="card" id="cardGanancia">
             <div class="card-title">
               <div class="circle purple">📈</div>
-              Ganancia
+              Ingresos del mes
             </div>
             <div class="value" id="statGanancia">$0</div>
           </div>
@@ -130,21 +130,19 @@
         <div class="actions">
           <a href="nueva-venta.html" class="action primary">🛒 Nueva venta</a>
           <a href="pedidos.html" class="action">📋 Ver pedidos</a>
-          <div class="action">📦 Nueva producción</div>
-          <div class="action">📥 Agregar inventario</div>
+          <a href="produccion.html" class="action">📦 Nueva producción</a>
+          <a href="inventario.html" class="action">📥 Agregar inventario</a>
         </div>
 
         <div class="panels">
           <div class="chart">
             <h3>Ventas - Últimos 30 días</h3>
-            <svg width="100%" height="80" viewBox="0 0 300 80" preserveAspectRatio="none">
-              <polyline
-                points="0,70 50,80 90,50 130,55 180,30 230,35 300,10"
-                fill="none"
-                stroke="#ff3131"
-                stroke-width="3"
-              />
-            </svg>
+            <div id="graficoVentas">
+              <svg width="100%" height="120" viewBox="0 0 300 120" preserveAspectRatio="none">
+                <polyline id="lineaVentas" points="" fill="none" stroke="#ff3131" stroke-width="3" />
+              </svg>
+            </div>
+            <div class="chart-labels" id="etiquetasVentas"></div>
           </div>
         </div>
       </main>
