@@ -10,6 +10,8 @@ async function inicializarAuditoria() {
   const action = document.getElementById("filtroAccion");
   const onlyErrors = document.getElementById("soloErrores");
   const period = document.getElementById("periodoAuditoria");
+  const fechaDesde = document.getElementById("fechaDesde");
+  const fechaHasta = document.getElementById("fechaHasta");
   const empty = document.getElementById("auditEmpty");
   const timeline = document.getElementById("auditTimeline");
   const log = document.querySelector(".audit-log");
@@ -32,6 +34,16 @@ async function inicializarAuditoria() {
     }
     if (value === "mes") start.setDate(1);
     return start;
+  }
+
+  function rangoPersonalizado() {
+    const desde = fechaDesde.value;
+    const hasta = fechaHasta.value;
+    if (!desde && !hasta) return null;
+    const rango = {};
+    if (desde) rango.desde = inicioDelDia(new Date(desde + "T00:00:00"));
+    if (hasta) rango.hasta = new Date(hasta + "T23:59:59.999");
+    return rango;
   }
 
   function formatoHora(eventDate) {
@@ -214,8 +226,14 @@ async function inicializarAuditoria() {
       .order("created_at", { ascending: false })
       .limit(500);
 
-    const desde = inicioPeriodo(period.value);
-    if (desde) query = query.gte("created_at", desde.toISOString());
+    const rango = rangoPersonalizado();
+    if (rango) {
+      if (rango.desde) query = query.gte("created_at", rango.desde.toISOString());
+      if (rango.hasta) query = query.lte("created_at", rango.hasta.toISOString());
+    } else {
+      const desde = inicioPeriodo(period.value);
+      if (desde) query = query.gte("created_at", desde.toISOString());
+    }
 
     const { data, error } = await query;
 
@@ -238,7 +256,19 @@ async function inicializarAuditoria() {
   [search, user, module, action, onlyErrors].forEach((control) => {
     control.addEventListener(control === search ? "input" : "change", aplicarFiltros);
   });
-  period.addEventListener("change", cargarEventos);
+  period.addEventListener("change", () => {
+    fechaDesde.value = "";
+    fechaHasta.value = "";
+    cargarEventos();
+  });
+  fechaDesde.addEventListener("change", () => {
+    period.value = "todo";
+    cargarEventos();
+  });
+  fechaHasta.addEventListener("change", () => {
+    period.value = "todo";
+    cargarEventos();
+  });
 
   document.getElementById("exportarAuditoria").addEventListener("click", () => {
     const rows = state.visible.map((event) => [
