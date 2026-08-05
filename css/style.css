@@ -1277,6 +1277,59 @@ body {
   background: #2a2a2a;
 }
 
+.notif-toast-container {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.notif-toast {
+  pointer-events: auto;
+  background: #1e1e1e;
+  border: 1px solid #2f2f2f;
+  border-left: 4px solid #4b9bdf;
+  border-radius: 10px;
+  padding: 10px 14px;
+  max-width: 320px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+  animation: toast-in 0.25s ease, toast-out 0.4s ease 7s forwards;
+}
+
+.notif-toast strong {
+  display: block;
+  color: #ffffff;
+  font-size: 13px;
+}
+
+.notif-toast .notif-toast-meta {
+  color: #8a8a8a;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes toast-out {
+  to {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+}
+
 .top-brand {
   display: flex;
   align-items: center;

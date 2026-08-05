@@ -220,7 +220,10 @@ function iniciarNotificacionesCampana() {
     .on(
       "postgres_changes",
       { event: "INSERT", schema: "public", table: "auditoria_eventos" },
-      () => cargarNotificacionesPendientes()
+      (payload) => {
+        mostrarToastNotificacion(payload.new);
+        cargarNotificacionesPendientes();
+      }
     )
     .subscribe();
 
@@ -249,6 +252,35 @@ function formatoHoraReciente(eventDate) {
 function iconoActividad(event) {
   const map = { success: "✅", warning: "⚠️", error: "❌", info: "ℹ️", system: "🔧" };
   return map[event.tipo] || "🔔";
+}
+
+function mostrarToastNotificacion(event) {
+  if (!event) return;
+  const contenedor = document.querySelector(".notif-toast-container") || crearContenedorToast();
+  if (!contenedor) return;
+
+  const actor = event.actor_nombre || "Sistema";
+  const message = event.mensaje || `${actor} ${event.accion || "registró una acción"}`;
+  const text = message.startsWith(actor) ? message : `${actor} ${message}`;
+  const detalle = [event.modulo, event.detalle].filter(Boolean).join(" · ");
+
+  const toast = document.createElement("div");
+  toast.className = "notif-toast";
+  toast.innerHTML = `
+    <strong>${iconoActividad(event)} ${text}</strong>
+    <div class="notif-toast-meta">${detalle}</div>
+  `;
+  contenedor.appendChild(toast);
+
+  setTimeout(() => toast.remove(), 7600);
+  while (contenedor.children.length > 4) contenedor.firstElementChild.remove();
+}
+
+function crearContenedorToast() {
+  const contenedor = document.createElement("div");
+  contenedor.className = "notif-toast-container";
+  document.body.appendChild(contenedor);
+  return contenedor;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
