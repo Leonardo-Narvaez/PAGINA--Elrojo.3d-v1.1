@@ -164,7 +164,7 @@ async function cargarNotificacionesPendientes() {
   const userId = authData?.user?.id || null;
 
   const { data, error } = await supabaseClient
-    .from("auditoria_eventos")
+    .from("notificaciones")
     .select("id, created_at, actor_nombre, modulo, accion, tipo, mensaje, detalle")
     .order("created_at", { ascending: false })
     .limit(8);
@@ -181,10 +181,10 @@ async function cargarNotificacionesPendientes() {
   if (userId && ids.length > 0) {
     const { data: filasLeidas } = await supabaseClient
       .from("notificaciones_leidas")
-      .select("evento_id")
+      .select("notificacion_id")
       .eq("usuario_id", userId)
-      .in("evento_id", ids);
-    leidas = new Set((filasLeidas || []).map((r) => r.evento_id));
+      .in("notificacion_id", ids);
+    leidas = new Set((filasLeidas || []).map((r) => r.notificacion_id));
   }
 
   notificacionesPendientesIds = eventos
@@ -205,7 +205,7 @@ async function marcarNotificacionesLeidas(eventIds) {
 
   const { error } = await supabaseClient
     .from("notificaciones_leidas")
-    .insert(nuevos.map((evento_id) => ({ usuario_id: userId, evento_id })));
+    .insert(nuevos.map((notificacion_id) => ({ usuario_id: userId, notificacion_id })));
   if (error) console.warn("No se pudo marcar como leídas:", error.message);
 
   await cargarNotificacionesPendientes();
@@ -214,12 +214,12 @@ async function marcarNotificacionesLeidas(eventIds) {
 function iniciarNotificacionesCampana() {
   if (!supabaseClient || canalNotificacionesCampana) return;
 
-  // En vivo: una auditoría nueva aparece de inmediato en la campana.
+  // En vivo: una notificación nueva aparece de inmediato en la campana.
   canalNotificacionesCampana = supabaseClient
     .channel("elrojo-campana-realtime")
     .on(
       "postgres_changes",
-      { event: "INSERT", schema: "public", table: "auditoria_eventos" },
+      { event: "INSERT", schema: "public", table: "notificaciones" },
       (payload) => {
         mostrarToastNotificacion(payload.new);
         cargarNotificacionesPendientes();
