@@ -150,16 +150,63 @@ function renderProductosInventario(productos) {
     .join("");
 }
 
+async function cargarMovimientos() {
+  if (!supabaseListoInventario()) return [];
+  const { data, error } = await supabaseClient
+    .from("movimientos_inventario")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(10);
+  if (error) {
+    console.error(error);
+    return [];
+  }
+  return data;
+}
+
+function renderMovimientos(movimientos) {
+  const contenedor = document.getElementById("listaMovimientos");
+  if (!contenedor) return;
+
+  if (movimientos.length === 0) {
+    contenedor.innerHTML = `<p class="empty-state">Aún no hay movimientos registrados.</p>`;
+    return;
+  }
+
+  contenedor.innerHTML = movimientos
+    .map((m) => {
+      const signo = m.tipo === "entrada" ? "+" : "−";
+      const icono = m.tipo === "entrada" ? "🟢" : "🔴";
+      const tipoTexto = m.tipo === "entrada" ? "Entrada" : "Salida";
+      const cantidad = m.tipo === "entrada" ? `${signo}${m.cantidad} ${m.entidad_tipo === "filamento" ? "g" : "uds"}` : `${signo}${m.cantidad} ${m.entidad_tipo === "filamento" ? "g" : "uds"}`;
+      const fecha = new Date(m.created_at).toLocaleString("es-CO", {
+        day: "numeric",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      return `
+        <div class="inv-item">
+          <strong>${icono} ${cantidad} ${m.entidad_nombre || "Sin nombre"}</strong>
+          <br />${tipoTexto} · ${m.origen || "-"}${m.referencia ? ` · ${m.referencia}` : ""} · ${fecha}
+        </div>
+      `;
+    })
+    .join("");
+}
+
 async function inicializarInventario() {
   if (!document.getElementById("healthScore")) return;
 
   filamentosCache = await cargarFilamentosInventario();
   productosCache = await cargarProductosInventario();
+  const movimientos = await cargarMovimientos();
 
   renderSalud(filamentosCache);
   renderMetricas(filamentosCache);
   renderFilamentosInventario(filamentosCache);
   renderProductosInventario(productosCache);
+  renderMovimientos(movimientos);
 }
 
 document.addEventListener("DOMContentLoaded", () => {

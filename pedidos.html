@@ -93,6 +93,30 @@
 
     <button class="floating" aria-label="Agregar" onclick="window.location.href='nueva-venta.html'">+</button>
 
+    <div class="modal-overlay" id="modalDescuentoFilamento">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3>Registrar entrega</h3>
+          <button type="button" class="modal-close" onclick="cerrarModalDescuentoFilamento()">✕</button>
+        </div>
+        <p id="modalDescuentoInfo" class="modal-info" style="margin-bottom: 12px"></p>
+        <form id="formDescuentoFilamento">
+          <div class="input-group">
+            <label>Filamento consumido</label>
+            <select id="descuentoFilamento" required></select>
+          </div>
+          <div class="input-group">
+            <label>Gramos utilizados</label>
+            <input type="number" id="descuentoGramos" min="1" placeholder="Ej. 120" required />
+          </div>
+          <div class="form-actions">
+            <button type="button" class="action" onclick="cerrarModalDescuentoFilamento()">Cancelar</button>
+            <button type="submit" class="action primary">Confirmar entrega</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <div class="bottom-nav mobile-only">
       <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span>Inicio</a>
       <a href="inventario.html" class="nav-item"><span class="nav-icon">📦</span>Inventario</a>

@@ -234,6 +234,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const venta = {
         numero: await siguienteNumeroPedido(),
         producto: document.getElementById("productoBuscar").value.trim(),
+        producto_id: document.getElementById("productoId").value || null,
         precio_unitario: Number(document.getElementById("productoPrecio").value) || 0,
         cliente: document.getElementById("clienteBuscarVenta").value.trim(),
         cliente_id: document.getElementById("clienteId").value || null,

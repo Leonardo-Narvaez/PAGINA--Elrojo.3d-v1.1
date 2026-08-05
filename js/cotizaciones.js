@@ -39,11 +39,6 @@ async function cargarCotizaciones() {
 
 }
 
-function formatoMoney(valor) {
-  const numero = Number(valor) || 0;
-  return "$" + Math.round(numero).toLocaleString("es-CO");
-}
-
 // ===== Productos dinámicos =====
 
 function plantillaProducto(idx, datos) {
@@ -511,6 +506,7 @@ async function crearPedidosDesdeCotizacion() {
     filasPedidos.push({
       numero: await siguienteNumeroPedido(),
       producto: p.nombre + (p.color ? ` (${p.color})` : ""),
+      producto_id: p.catalogoId || null,
       precio_unitario: p.precioUnitario,
       cliente,
       cliente_id: document.getElementById("cotClienteId").value || null,

@@ -1262,6 +1262,11 @@ body {
   padding-top: 0;
 }
 
+.notif-meta {
+  color: #8a8a8a;
+  font-size: 12px;
+}
+
 .top-brand {
   display: flex;
   align-items: center;

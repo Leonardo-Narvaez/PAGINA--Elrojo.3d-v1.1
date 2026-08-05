@@ -127,10 +127,80 @@ async function buscarPedido(id) {
   return data;
 }
 
+async function descontarStockProducto(productoId, cantidad, referencia) {
+  if (!productoId || !cantidad) return;
+  const { data: producto, error: errorGet } = await supabaseClient
+    .from("productos")
+    .select("stock, nombre")
+    .eq("id", productoId)
+    .single();
+  if (errorGet || !producto) return;
+
+  const stockActual = Number(producto.stock) || 0;
+  const nuevoStock = Math.max(0, stockActual - cantidad);
+  const { error } = await supabaseClient
+    .from("productos")
+    .update({ stock: nuevoStock })
+    .eq("id", productoId);
+  if (error) {
+    alert("No se pudo descontar el stock del producto: " + error.message);
+    return;
+  }
+  await registrarMovimiento({
+    tipo: "salida",
+    origen: "venta",
+    entidadTipo: "producto",
+    entidadId: productoId,
+    entidadNombre: producto.nombre,
+    cantidad,
+    referencia,
+  });
+}
+
+async function descontarFilamento(filamentoId, gramos, referencia) {
+  if (!filamentoId || !gramos) return;
+  const { data: filamento, error: errorGet } = await supabaseClient
+    .from("filamentos")
+    .select("disponible, nombre")
+    .eq("id", filamentoId)
+    .single();
+  if (errorGet || !filamento) return;
+
+  const disponible = Number(filamento.disponible) || 0;
+  const nuevoDisponible = Math.max(0, disponible - gramos);
+  const { error } = await supabaseClient
+    .from("filamentos")
+    .update({ disponible: nuevoDisponible })
+    .eq("id", filamentoId);
+  if (error) {
+    alert("No se pudo descontar el filamento: " + error.message);
+    return;
+  }
+  await registrarMovimiento({
+    tipo: "salida",
+    origen: "venta",
+    entidadTipo: "filamento",
+    entidadId: filamentoId,
+    entidadNombre: filamento.nombre,
+    cantidad: gramos,
+    referencia,
+  });
+}
+
 async function actualizarEstadoPedido(id, nuevoEstado) {
   if (!supabaseListoPedidos()) return;
   const pedido = await buscarPedido(id);
   const anterior = pedido ? pedido.estado : "?";
+
+  if (nuevoEstado === "Entregado") {
+    await abrirModalEntrega(pedido);
+    return;
+  }
+
+  await guardarEstadoPedido(id, pedido?.numero, anterior, nuevoEstado);
+}
+
+async function guardarEstadoPedido(id, numeroPedido, anterior, nuevoEstado) {
   const { error } = await supabaseClient.from("pedidos").update({ estado: nuevoEstado }).eq("id", id);
   if (error) {
     alert("No se pudo actualizar el estado: " + error.message);
@@ -140,7 +210,7 @@ async function actualizarEstadoPedido(id, nuevoEstado) {
     "Pedidos",
     "Cambió estado",
     "warning",
-    `cambió el estado del pedido ${pedido?.numero || id} de ${anterior} a ${nuevoEstado}.`
+    `cambió el estado del pedido ${numeroPedido || id} de ${anterior} a ${nuevoEstado}.`
   );
   await refrescarVistaPedidos();
 }
@@ -162,6 +232,74 @@ async function actualizarPagoPedido(id, nuevoPago) {
   );
   await refrescarVistaPedidos();
 }
+
+// ===== Modal: registrar entrega y descontar inventario =====
+
+let entregaPedidoActual = null;
+let entregaEstadoAnterior = "";
+
+async function abrirModalEntrega(pedido) {
+  if (!pedido) return;
+  entregaPedidoActual = pedido;
+  entregaEstadoAnterior = pedido.estado;
+
+  const info = document.getElementById("modalDescuentoInfo");
+  if (info) {
+    info.textContent = `${pedido.numero || pedido.producto} · ${pedido.producto} · Cantidad: ${pedido.cantidad}`;
+  }
+
+  const select = document.getElementById("descuentoFilamento");
+  const { data, error } = await supabaseClient
+    .from("filamentos")
+    .select("id, nombre, disponible")
+    .order("nombre");
+
+  if (error) {
+    console.error(error);
+    select.innerHTML = `<option value="">Sin filamentos</option>`;
+  } else {
+    const activos = (data || []).filter((f) => (Number(f.disponible) || 0) > 0);
+    select.innerHTML =
+      activos.length > 0
+        ? activos
+            .map(
+              (f) =>
+                `<option value="${f.id}">${f.nombre} (${Number(f.disponible)} g disponibles)</option>`
+            )
+            .join("")
+        : `<option value="">No hay filamento disponible</option>`;
+  }
+
+  document.getElementById("descuentoGramos").value = "";
+  document.getElementById("modalDescuentoFilamento").classList.add("open");
+}
+
+function cerrarModalDescuentoFilamento() {
+  document.getElementById("modalDescuentoFilamento").classList.remove("open");
+}
+
+document.addEventListener("submit", async (event) => {
+  if (event.target.id !== "formDescuentoFilamento") return;
+  event.preventDefault();
+
+  const filamentoId = document.getElementById("descuentoFilamento").value;
+  const gramos = Number(document.getElementById("descuentoGramos").value) || 0;
+  const pedido = entregaPedidoActual;
+
+  if (!pedido) return;
+  if (!filamentoId || gramos <= 0) {
+    alert("Selecciona el filamento y escribe los gramos utilizados.");
+    return;
+  }
+
+  await descontarFilamento(filamentoId, gramos, pedido.numero || pedido.id);
+  if (pedido.producto_id) {
+    await descontarStockProducto(pedido.producto_id, pedido.cantidad, pedido.numero || pedido.id);
+  }
+
+  cerrarModalDescuentoFilamento();
+  await guardarEstadoPedido(pedido.id, pedido.numero, entregaEstadoAnterior, "Entregado");
+});
 
 async function eliminarPedido(id) {
   if (!confirm("¿Eliminar este pedido? Esta acción no se puede deshacer.")) return;

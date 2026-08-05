@@ -283,6 +283,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!supabaseListo()) return;
 
     const id = document.getElementById("filamentoId").value;
+    const filamentoPrevio = id ? filamentosCache.find((f) => f.id === id) : null;
     const filamento = {
       nombre: document.getElementById("filamentoNombre").value.trim(),
       marca: document.getElementById("filamentoMarca").value.trim(),
@@ -309,6 +310,20 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    const previoDisponible = filamentoPrevio ? Number(filamentoPrevio.disponible) || 0 : 0;
+    const nuevoDisponible = Number(filamento.disponible) || 0;
+    if (nuevoDisponible > previoDisponible) {
+      await registrarMovimiento({
+        tipo: "entrada",
+        origen: "compra",
+        entidadTipo: "filamento",
+        entidadId: id || null,
+        entidadNombre: filamento.nombre,
+        cantidad: nuevoDisponible - previoDisponible,
+        referencia: "Compra",
+      });
+    }
+
     await renderFilamentos();
     cerrarModales();
   });
@@ -319,6 +334,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!supabaseListo()) return;
 
     const id = document.getElementById("productoId").value;
+    const productoPrevio = id ? productosCache.find((p) => p.id === id) : null;
     const stockMinimoRaw = document.getElementById("productoStockMinimo").value.trim();
     const producto = {
       nombre: document.getElementById("productoNombre").value.trim(),
@@ -344,6 +360,20 @@ document.addEventListener("DOMContentLoaded", () => {
     if (error) {
       alert("No se pudo guardar: " + error.message);
       return;
+    }
+
+    const previoStock = productoPrevio ? Number(productoPrevio.stock) || 0 : 0;
+    const nuevoStock = Number(producto.stock) || 0;
+    if (nuevoStock > previoStock) {
+      await registrarMovimiento({
+        tipo: "entrada",
+        origen: "compra",
+        entidadTipo: "producto",
+        entidadId: id || null,
+        entidadNombre: producto.nombre,
+        cantidad: nuevoStock - previoStock,
+        referencia: "Compra",
+      });
     }
 
     await renderProductos();

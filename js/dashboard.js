@@ -109,27 +109,70 @@ async function inicializarDashboard() {
   }
 
   // ===== Actividad reciente =====
-  actualizarNotificacionesDashboard(pedidos);
+  actualizarNotificacionesDashboard();
+  setInterval(() => {
+    if (document.getElementById("notifDashboard") && !document.querySelector(".notif-panel.open")) {
+      actualizarNotificacionesDashboard();
+    }
+  }, 30000);
 }
 
-function actualizarNotificacionesDashboard(pedidos) {
+function formatoHoraReciente(eventDate) {
+  const diffMinutes = Math.floor((new Date() - eventDate) / 60000);
+  if (diffMinutes < 1) return "Ahora";
+  if (diffMinutes < 60) return `Hace ${diffMinutes} min`;
+  const diffHours = Math.floor(diffMinutes / 60);
+  if (diffHours < 24) return `Hace ${diffHours} ${diffHours === 1 ? "hora" : "horas"}`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays === 1) return "Ayer";
+  if (diffDays < 7) return `Hace ${diffDays} días`;
+  return eventDate.toLocaleString("es-CO", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+}
+
+function iconoActividad(event) {
+  const map = { success: "✅", warning: "⚠️", error: "❌", info: "ℹ️", system: "🔧" };
+  return map[event.tipo] || "🔔";
+}
+
+async function actualizarNotificacionesDashboard() {
   const contenedor = document.getElementById("notifDashboard");
   if (!contenedor) return;
+  if (typeof supabaseClient === "undefined" || !supabaseClient) {
+    contenedor.innerHTML = `<div class="notif-item">No hay novedades por ahora.</div>`;
+    return;
+  }
 
-  const pendientes = pedidos.filter((p) => p.estado === "Pendiente" || p.estado === "Confirmado").length;
-  const enProduccion = pedidos.filter((p) => p.estado === "En producción").length;
-  const listos = pedidos.filter((p) => p.estado === "Listo").length;
-  const entregados = pedidos.filter((p) => p.estado === "Entregado").length;
+  const { data, error } = await supabaseClient
+    .from("auditoria_eventos")
+    .select("created_at, actor_nombre, modulo, accion, tipo, mensaje, detalle")
+    .order("created_at", { ascending: false })
+    .limit(8);
 
-  const notificaciones = [];
-  if (pendientes > 0) notificaciones.push(`🆕 ${pendientes} pedido${pendientes === 1 ? "" : "s"} pendiente${pendientes === 1 ? "" : "s"}.`);
-  if (enProduccion > 0) notificaciones.push(`🖨️ ${enProduccion} pedido${enProduccion === 1 ? "" : "s"} en producción.`);
-  if (listos > 0) notificaciones.push(`✅ ${listos} pedido${listos === 1 ? "" : "s"} listo${listos === 1 ? "" : "s"} para entrega.`);
-  if (entregados > 0) notificaciones.push(`🚚 ${entregados} pedido${entregados === 1 ? "" : "s"} entregado${entregados === 1 ? "" : "s"}.`);
+  if (error) {
+    console.warn("No se pudo cargar la actividad reciente:", error.message);
+    contenedor.innerHTML = `<div class="notif-item">No hay novedades por ahora.</div>`;
+    return;
+  }
 
+  const eventos = data || [];
   contenedor.innerHTML =
-    notificaciones.length > 0
-      ? notificaciones.map((n) => `<div class="notif-item">${n}</div>`).join("")
+    eventos.length > 0
+      ? eventos
+          .map((event) => {
+            const actor = event.actor_nombre || "Sistema";
+            const message = event.mensaje || `${actor} ${event.accion || "registró una acción"}`;
+            const text = message.startsWith(actor) ? message : `${actor} ${message}`;
+            const detalle = [event.modulo, event.detalle, formatoHoraReciente(new Date(event.created_at))]
+              .filter(Boolean)
+              .join(" · ");
+            return `
+              <div class="notif-item">
+                <strong>${iconoActividad(event)} ${text}</strong>
+                <br /><small class="notif-meta">${detalle}</small>
+              </div>
+            `;
+          })
+          .join("")
       : `<div class="notif-item">No hay novedades por ahora.</div>`;
 }
 

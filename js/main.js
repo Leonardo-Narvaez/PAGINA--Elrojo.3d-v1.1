@@ -1,3 +1,8 @@
+function formatoMoney(valor) {
+  const numero = Number(valor) || 0;
+  return "$" + Math.round(numero).toLocaleString("es-CO");
+}
+
 function login() {
   const email = document.querySelector('input[type="email"]').value.trim();
   const password = document.querySelector('input[type="password"]').value.trim();
@@ -51,6 +56,24 @@ async function registrarAuditoria(modulo, accion, tipo, mensaje, detalle) {
   });
   if (error) {
     console.warn("No se pudo registrar en auditoría:", error.message);
+  }
+}
+
+async function registrarMovimiento({ tipo, origen, entidadTipo, entidadId, entidadNombre, cantidad, referencia }) {
+  if (typeof supabaseClient === "undefined" || !supabaseClient) return;
+  const { data: authData } = await supabaseClient.auth.getUser();
+  const { error } = await supabaseClient.from("movimientos_inventario").insert({
+    tipo,
+    origen,
+    entidad_tipo: entidadTipo,
+    entidad_id: entidadId || null,
+    entidad_nombre: entidadNombre || "",
+    cantidad: Number(cantidad) || 0,
+    referencia: referencia || null,
+    usuario_id: authData?.user?.id || null,
+  });
+  if (error) {
+    console.warn("No se pudo registrar el movimiento:", error.message);
   }
 }
 
