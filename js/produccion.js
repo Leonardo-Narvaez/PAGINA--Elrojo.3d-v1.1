@@ -5,16 +5,18 @@ function actualizarNotificacionesProduccion(pedidos) {
   const contenedor = document.getElementById("notifProduccion");
   if (!contenedor) return;
 
-  const pendientes = pedidos.filter((p) => p.estado === "Pendiente").length;
+  const pendientes = pedidos.filter((p) => p.estado === "Pendiente" || p.estado === "Confirmado").length;
   const enProduccion = pedidos.filter((p) => p.estado === "En producción").length;
   const listos = pedidos.filter((p) => p.estado === "Listo").length;
-  const porPagar = pedidos.filter((p) => p.estado_pago === "Por pagar" || p.estado_pago === "Pendiente").length;
+  const porPagar = pedidos.filter(
+    (p) => p.estado_pago === "Pendiente" || p.estado_pago === "Parcial"
+  ).length;
 
   const notificaciones = [];
 
   if (pendientes > 0) {
     notificaciones.push(
-      `🆕 ${pendientes} pedido${pendientes === 1 ? "" : "s"} nuevo${pendientes === 1 ? "" : "s"} pendiente${pendientes === 1 ? "" : "s"} de iniciar.`
+      `🆕 ${pendientes} pedido${pendientes === 1 ? "" : "s"} pendiente${pendientes === 1 ? "" : "s"} de iniciar.`
     );
   }
   if (enProduccion > 0) {
@@ -39,16 +41,24 @@ function actualizarNotificacionesProduccion(pedidos) {
 async function inicializarProduccion() {
   const pedidos = await cargarPedidos();
 
-  document.getElementById("statActivas").textContent = pedidos.filter((p) => p.estado !== "Listo").length;
-  document.getElementById("statPendientes").textContent = pedidos.filter((p) => p.estado === "Pendiente").length;
-  document.getElementById("statListos").textContent = pedidos.filter((p) => p.estado === "Listo").length;
+  document.getElementById("statActivas").textContent = pedidos.filter(
+    (p) => p.estado !== "Listo" && p.estado !== "Entregado"
+  ).length;
+  document.getElementById("statPendientes").textContent = pedidos.filter(
+    (p) => p.estado === "Pendiente" || p.estado === "Confirmado"
+  ).length;
+  document.getElementById("statListos").textContent = pedidos.filter(
+    (p) => p.estado === "Listo"
+  ).length;
 
   actualizarNotificacionesProduccion(pedidos);
 
   const columnas = {
     Pendiente: document.getElementById("colPendiente"),
+    Confirmado: document.getElementById("colConfirmado"),
     "En producción": document.getElementById("colEnProduccion"),
     Listo: document.getElementById("colListo"),
+    Entregado: document.getElementById("colEntregado"),
   };
 
   Object.values(columnas).forEach((col) => {

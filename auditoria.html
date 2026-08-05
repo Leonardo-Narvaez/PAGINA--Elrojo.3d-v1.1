@@ -25,7 +25,7 @@
         <a href="administrador.html" class="back-link desktop-only">← Volver al Panel administrativo</a>
         <header class="audit-header">
           <div><p class="audit-kicker">Administrador</p><h1 class="page-title">🔎 Auditoría del sistema</h1><p class="description-left">Consulta las acciones y cambios registrados en tu operación.</p></div>
-          <div class="audit-header-actions"><label class="audit-period-label" for="periodoAuditoria">Periodo</label><select id="periodoAuditoria" class="audit-select audit-period" aria-label="Periodo de auditoría"><option value="hoy">Hoy</option><option value="semana">Esta semana</option><option value="mes">Este mes</option></select><button id="exportarAuditoria" class="audit-export-btn" type="button">Exportar <span aria-hidden="true">↓</span></button></div>
+          <div class="audit-header-actions"><label class="audit-period-label" for="periodoAuditoria">Periodo</label><select id="periodoAuditoria" class="audit-select audit-period" aria-label="Periodo de auditoría"><option value="hoy">Hoy</option><option value="semana">Esta semana</option><option value="mes">Este mes</option><option value="todo">Todo</option></select><button id="exportarAuditoria" class="audit-export-btn" type="button">Exportar <span aria-hidden="true">↓</span></button></div>
         </header>
         <section class="audit-metrics" aria-label="Resumen de auditoría">
           <article class="audit-metric"><span>Eventos</span><strong id="metricEventos">—</strong><small>en el periodo</small></article><article class="audit-metric"><span>Hoy</span><strong id="metricHoy">—</strong><small>acciones</small></article><article class="audit-metric"><span>Usuarios</span><strong id="metricUsuarios">—</strong><small>con actividad</small></article><article class="audit-metric audit-metric-error"><span>Errores</span><strong id="metricErrores">—</strong><small>detectados</small></article>
@@ -34,6 +34,7 @@
           <label class="audit-search"><span class="sr-only">Buscar eventos</span><input id="buscarAuditoria" type="search" placeholder="Buscar eventos..." /></label><select id="filtroUsuario" class="audit-select" aria-label="Filtrar por usuario"><option value="">Usuario</option></select><select id="filtroModulo" class="audit-select" aria-label="Filtrar por módulo"><option value="">Módulo</option></select><select id="filtroAccion" class="audit-select" aria-label="Filtrar por acción"><option value="">Acción</option></select><label class="audit-check"><input id="soloErrores" type="checkbox" /> <span>Solo errores</span></label>
         </section>
         <section class="audit-log is-loading" aria-live="polite">
+          <nav class="audit-pagination" id="auditPagination" aria-label="Paginación de auditoría" hidden></nav>
           <p id="auditEmpty" class="audit-empty">Cargando eventos de auditoría...</p>
           <div id="auditTimeline"></div>
           <div class="audit-day" data-day="hoy"><h2><span></span>Hoy</h2><div class="audit-events">

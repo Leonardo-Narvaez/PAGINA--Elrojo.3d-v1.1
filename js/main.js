@@ -24,6 +24,36 @@ function validarEmail(email) {
   return regex.test(email);
 }
 
+async function siguienteNumeroPedido() {
+  if (typeof supabaseClient === "undefined" || !supabaseClient) return "PED-1000";
+  const { data, error } = await supabaseClient
+    .from("pedidos")
+    .select("numero");
+  if (error) {
+    console.error(error);
+    return "PED-1000";
+  }
+  const max = (data || []).reduce((mayor, p) => {
+    const n = parseInt((p.numero || "").replace(/\D/g, ""), 10) || 0;
+    return n > mayor ? n : mayor;
+  }, 1000);
+  return "PED-" + (max + 1);
+}
+
+async function registrarAuditoria(modulo, accion, tipo, mensaje, detalle) {
+  if (typeof supabaseClient === "undefined" || !supabaseClient) return;
+  const { error } = await supabaseClient.rpc("registrar_evento", {
+    p_modulo: modulo,
+    p_accion: accion,
+    p_tipo: tipo,
+    p_mensaje: mensaje,
+    p_detalle: detalle,
+  });
+  if (error) {
+    console.warn("No se pudo registrar en auditoría:", error.message);
+  }
+}
+
 function toggleNotifications(button) {
   const panel = button.nextElementSibling;
   const isOpen = panel.classList.contains("open");

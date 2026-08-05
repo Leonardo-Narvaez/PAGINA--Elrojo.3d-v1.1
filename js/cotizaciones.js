@@ -322,6 +322,7 @@ async function guardarCotizacion() {
   const { productos, ...cabecera } = cot;
 
   let cotizacionId = cotizacionEditandoId;
+  const esNueva = !cotizacionId;
 
   if (cotizacionId) {
     const { error } = await supabaseClient.from("cotizaciones").update(cabecera).eq("id", cotizacionId);
@@ -364,6 +365,12 @@ async function guardarCotizacion() {
   }
 
   cotizacionEditandoId = cotizacionId;
+  await registrarAuditoria(
+    "Cotizaciones",
+    esNueva ? "Creó" : "Modificó",
+    "success",
+    `${esNueva ? "creó" : "modificó"} la cotización ${cot.folio} para ${cot.cliente} por ${formatoMoney(cot.total)}.`
+  );
   await renderCotizacionesGuardadas();
   alert(`Cotización ${cot.folio} guardada correctamente.`);
 }
@@ -427,12 +434,20 @@ async function eliminarCotizacionGuardada(id) {
   if (!confirm("¿Eliminar esta cotización guardada? Esta acción no se puede deshacer.")) return;
   if (!supabaseListoCot()) return;
 
+  const cot = cotizacionesCache.find((c) => c.id === id);
+
   // Los productos se borran solos por el "on delete cascade" de la tabla.
   const { error } = await supabaseClient.from("cotizaciones").delete().eq("id", id);
   if (error) {
     alert("No se pudo eliminar: " + error.message);
     return;
   }
+  await registrarAuditoria(
+    "Cotizaciones",
+    "Eliminó",
+    "error",
+    `eliminó la cotización ${cot?.folio || id} (${cot?.cliente || "sin cliente"}).`
+  );
   renderCotizacionesGuardadas();
 }
 
@@ -441,10 +456,13 @@ async function renderCotizacionesGuardadas() {
   if (!contenedor) return;
 
   cotizacionesCache = await cargarCotizaciones();
-  const lista = cotizacionesCache;
+  const activas = cotizacionesCache.filter(
+    (c) => c.estado === "Pendiente" || c.estado === "En espera"
+  );
+  const lista = activas;
 
   if (lista.length === 0) {
-    contenedor.innerHTML = `<p class="empty-state">Aún no has guardado ninguna cotización.</p>`;
+    contenedor.innerHTML = `<p class="empty-state">No hay cotizaciones pendientes o en espera.</p>`;
     return;
   }
 
@@ -478,32 +496,71 @@ async function renderCotizacionesGuardadas() {
 
 // ===== Convertir en orden / venta =====
 
-async function convertirEnOrden() {
+async function crearPedidosDesdeCotizacion() {
   const cliente = document.getElementById("cotCliente").value.trim();
-  if (!cliente) {
+  const productos = leerProductos().filter((p) => p.nombre && p.cantidad > 0);
+  if (!cliente || productos.length === 0) {
     alert("Completa al menos el cliente y un producto antes de convertir la cotización.");
-    return;
+    return null;
+  }
+  if (!supabaseListoCot()) return null;
+
+  const cot = recolectarCotizacionActual();
+  const filasPedidos = [];
+  for (const p of productos) {
+    filasPedidos.push({
+      numero: await siguienteNumeroPedido(),
+      producto: p.nombre + (p.color ? ` (${p.color})` : ""),
+      precio_unitario: p.precioUnitario,
+      cliente,
+      cliente_id: document.getElementById("cotClienteId").value || null,
+      asesor: "",
+      cantidad: p.cantidad,
+      fecha_entrega: null,
+      entrega_sin_definir: true,
+      estado: "Confirmado",
+      estado_pago: "Pendiente",
+      cotizacion_id: cotizacionEditandoId || null,
+      observaciones: `Cotización ${cot.folio}. ${p.descripcion || ""}`.trim(),
+    });
   }
 
+  const { error } = await supabaseClient.from("pedidos").insert(filasPedidos);
+  if (error) {
+    alert("La cotización se guardó, pero no se pudieron crear los pedidos: " + error.message);
+    return null;
+  }
+
+  await registrarAuditoria(
+    "Cotizaciones",
+    "Convirtió",
+    "success",
+    `convirtió la cotización ${cot.folio} en ${filasPedidos.length} pedido${filasPedidos.length === 1 ? "" : "s"}: ${filasPedidos.map((p) => p.numero).join(", ")}.`
+  );
+
+  return filasPedidos.length;
+}
+
+async function convertirEnOrden() {
   document.getElementById("cotEstado").value = "Aprobada";
   await guardarCotizacion();
 
-  alert(
-    "Cotización marcada como Aprobada. En un sistema con backend, esto crearía automáticamente el pedido en Producción. Por ahora, créalo manualmente desde 'Nueva venta'."
-  );
-  window.location.href = "nueva-venta.html";
+  const total = await crearPedidosDesdeCotizacion();
+  if (total === null) return;
+
+  alert(`${total} pedido${total === 1 ? "" : "s"} creado${total === 1 ? "" : "s"} como Confirmado.`);
+  window.location.href = "pedidos.html";
 }
 
 async function convertirEnVenta() {
-  const cliente = document.getElementById("cotCliente").value.trim();
-  if (!cliente) {
-    alert("Completa al menos el cliente y un producto antes de convertir la cotización.");
-    return;
-  }
-
+  document.getElementById("cotEstado").value = "Aprobada";
   await guardarCotizacion();
+
+  const total = await crearPedidosDesdeCotizacion();
+  if (total === null) return;
+
   alert(
-    "Cotización lista para convertir en venta. En un sistema con backend, esto descontaría el inventario y registraría la ganancia automáticamente."
+    `${total} pedido${total === 1 ? "" : "s"} creado${total === 1 ? "" : "s"}. La venta quedó registrada; verifica el pago en Pedidos.`
   );
   window.location.href = "ventas.html";
 }

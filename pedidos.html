@@ -64,19 +64,27 @@
         <h1 class="page-title">Pedidos</h1>
         <div class="description-left">Trazabilidad de cada pedido, de principio a fin.</div>
 
-        <div class="filter-group-label">Estado del pedido</div>
-        <div class="filter-tabs" data-filter-group="estado">
-          <button class="filter-tab active" data-filter="todos">Todos</button>
-          <button class="filter-tab" data-filter="Pendiente">Pendiente</button>
-          <button class="filter-tab" data-filter="En producción">En producción</button>
-          <button class="filter-tab" data-filter="Listo">Listo</button>
-        </div>
-
-        <div class="filter-group-label">Estado de pago</div>
-        <div class="filter-tabs" data-filter-group="pago">
-          <button class="filter-tab active" data-filter="todos">Todos</button>
-          <button class="filter-tab" data-filter="Por pagar">Por pagar</button>
-          <button class="filter-tab" data-filter="Pagado">Pagado</button>
+        <div class="filtros-pedidos">
+          <div class="input-group">
+            <label class="filter-group-label">Estado del pedido</label>
+            <select id="filtroEstado">
+              <option value="todos">Todos</option>
+              <option value="Pendiente">Pendiente</option>
+              <option value="Confirmado">Confirmado</option>
+              <option value="En producción">En producción</option>
+              <option value="Listo">Listo</option>
+              <option value="Entregado">Entregado</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label class="filter-group-label">Estado de pago</label>
+            <select id="filtroPago">
+              <option value="todos">Todos</option>
+              <option value="Pendiente">Pendiente</option>
+              <option value="Parcial">Parcial</option>
+              <option value="Pagado">Pagado</option>
+            </select>
+          </div>
         </div>
 
         <div class="pedidos-list" id="listaPedidos"></div>

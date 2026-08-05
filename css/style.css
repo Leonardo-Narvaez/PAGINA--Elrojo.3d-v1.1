@@ -958,12 +958,24 @@ body {
   background: #ff8f00;
 }
 
+.badge-confirmed {
+  background: #0288d1;
+}
+
 .badge-production {
   background: #1565c0;
 }
 
 .badge-unpaid {
   background: #c62828;
+}
+
+.badge-partial {
+  background: #f9a825;
+}
+
+.badge-delivered {
+  background: #6a1b9a;
 }
 
 /* ===== Tablet ===== */
@@ -1421,12 +1433,39 @@ body {
   background: #2e7d32;
 }
 
+.filtros-pedidos {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.filtros-pedidos .input-group {
+  flex: 1;
+  min-width: 0;
+}
+
+.filtros-pedidos .filter-group-label {
+  margin-bottom: 6px;
+}
+
+@media (max-width: 480px) {
+  .filtros-pedidos {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
 .filter-tabs {
   display: flex;
   gap: 8px;
   overflow-x: auto;
   padding-bottom: 4px;
   margin-bottom: 16px;
+  scrollbar-width: none;
+}
+
+.filter-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .filter-group-label {
@@ -2522,6 +2561,30 @@ body {
 .audit-event small { display: block; color: #999; font-size: 12px; line-height: 1.6; margin-top: 3px; }
 .audit-event i { color: #666; font-style: normal; padding: 0 2px; }
 .audit-empty { padding: 36px 0; color: #999; font-size: 13px; text-align: center; }
+.audit-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 4px 0 14px;
+}
+.audit-pagination[hidden] { display: none; }
+.audit-page-info { color: #999; font-size: 13px; width: 100%; text-align: center; }
+.audit-pagination button {
+  border: 1px solid #3a3a3a;
+  background: #1e1e1e;
+  color: #c9c9c9;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.audit-pagination button:hover:not(:disabled) { border-color: #555; }
+.audit-pagination button:disabled { opacity: 0.4; cursor: default; }
+.audit-page-nums { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.audit-page-nums button.active { background: #e63946; border-color: #e63946; color: #fff; font-weight: 600; }
 @media (min-width: 900px) {
   .audit-filters {
     display: grid;

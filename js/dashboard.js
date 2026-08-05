@@ -116,14 +116,16 @@ function actualizarNotificacionesDashboard(pedidos) {
   const contenedor = document.getElementById("notifDashboard");
   if (!contenedor) return;
 
-  const pendientes = pedidos.filter((p) => p.estado === "Pendiente").length;
+  const pendientes = pedidos.filter((p) => p.estado === "Pendiente" || p.estado === "Confirmado").length;
   const enProduccion = pedidos.filter((p) => p.estado === "En producción").length;
   const listos = pedidos.filter((p) => p.estado === "Listo").length;
+  const entregados = pedidos.filter((p) => p.estado === "Entregado").length;
 
   const notificaciones = [];
   if (pendientes > 0) notificaciones.push(`🆕 ${pendientes} pedido${pendientes === 1 ? "" : "s"} pendiente${pendientes === 1 ? "" : "s"}.`);
   if (enProduccion > 0) notificaciones.push(`🖨️ ${enProduccion} pedido${enProduccion === 1 ? "" : "s"} en producción.`);
   if (listos > 0) notificaciones.push(`✅ ${listos} pedido${listos === 1 ? "" : "s"} listo${listos === 1 ? "" : "s"} para entrega.`);
+  if (entregados > 0) notificaciones.push(`🚚 ${entregados} pedido${entregados === 1 ? "" : "s"} entregado${entregados === 1 ? "" : "s"}.`);
 
   contenedor.innerHTML =
     notificaciones.length > 0

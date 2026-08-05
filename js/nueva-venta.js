@@ -232,6 +232,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const sinDefinir = sinDefinirCheckbox.checked;
 
       const venta = {
+        numero: await siguienteNumeroPedido(),
         producto: document.getElementById("productoBuscar").value.trim(),
         precio_unitario: Number(document.getElementById("productoPrecio").value) || 0,
         cliente: document.getElementById("clienteBuscarVenta").value.trim(),
@@ -262,6 +263,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
 
+      await registrarAuditoria(
+        "Pedidos",
+        "Creó",
+        "success",
+        `creó el pedido ${venta.numero} (${venta.producto}) para ${venta.cliente}.`
+      );
       alert("Venta registrada correctamente.");
       window.location.href = "pedidos.html";
     });
