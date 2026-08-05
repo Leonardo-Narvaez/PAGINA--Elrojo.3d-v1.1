@@ -280,7 +280,8 @@ async function inicializarAuditoria() {
       .join("\n");
     const link = document.createElement("a");
     link.href = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }));
-    link.download = "auditoria-elrojo-3d.csv";
+    const hoy = new Date().toISOString().split("T")[0];
+    link.download = `auditoria-elrojo-3d-${hoy}.csv`;
     link.click();
     URL.revokeObjectURL(link.href);
   });
