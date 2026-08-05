@@ -124,6 +124,12 @@ async function renderProductos() {
         ? `<span class="badge badge-ready">Activo</span>`
         : `<span class="badge badge-inactive">Inactivo</span>`;
 
+      const stock = Number(p.stock) || 0;
+      const esBajo = p.stock_minimo != null && stock <= p.stock_minimo;
+      const stockBadge = esBajo
+        ? `<span class="badge badge-unpaid">Stock bajo</span>`
+        : "";
+
       return `
         <div class="stock-card">
           <div class="stock-card-header">
@@ -131,12 +137,13 @@ async function renderProductos() {
               <div class="stock-name">${p.nombre}</div>
               <div class="stock-sub">${p.categoria || "Sin categoría"}</div>
             </div>
-            <div class="stock-badges">${estadoBadge}</div>
+            <div class="stock-badges">${estadoBadge}${stockBadge}</div>
           </div>
           <div class="stock-meta">
             <span>Venta: ${formatoMoneda(p.precio_venta)}</span>
             <span>Costo: ${formatoMoneda(p.costo_produccion)}</span>
             <span>Impresión: ${p.tiempo_impresion || "Sin definir"}</span>
+            <span>Stock: ${stock}${p.stock_minimo != null ? ` (mín. ${p.stock_minimo})` : ""}</span>
           </div>
           ${p.descripcion ? `<div class="stock-desc">${p.descripcion}</div>` : ""}
           <div class="stock-actions">
@@ -201,6 +208,8 @@ function abrirModalProducto(id) {
       document.getElementById("productoPrecioVenta").value = producto.precio_venta;
       document.getElementById("productoCosto").value = producto.costo_produccion || "";
       document.getElementById("productoTiempo").value = producto.tiempo_impresion || "";
+      document.getElementById("productoStock").value = producto.stock ?? 0;
+      document.getElementById("productoStockMinimo").value = producto.stock_minimo ?? "";
       document.getElementById("productoActivo").checked = !!producto.activo;
     }
   } else {
@@ -310,6 +319,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!supabaseListo()) return;
 
     const id = document.getElementById("productoId").value;
+    const stockMinimoRaw = document.getElementById("productoStockMinimo").value.trim();
     const producto = {
       nombre: document.getElementById("productoNombre").value.trim(),
       descripcion: document.getElementById("productoDescripcion").value.trim(),
@@ -317,6 +327,8 @@ document.addEventListener("DOMContentLoaded", () => {
       precio_venta: Number(document.getElementById("productoPrecioVenta").value) || 0,
       costo_produccion: Number(document.getElementById("productoCosto").value) || 0,
       tiempo_impresion: document.getElementById("productoTiempo").value.trim(),
+      stock: Number(document.getElementById("productoStock").value) || 0,
+      stock_minimo: stockMinimoRaw !== "" ? Number(stockMinimoRaw) : null,
       activo: document.getElementById("productoActivo").checked,
     };
 

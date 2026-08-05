@@ -64,55 +64,38 @@
 
         <div class="health-card">
           <div class="health-title">❤️ Salud del inventario</div>
-          <div class="health-score">92%</div>
-          <div class="health-text">Estado excelente del inventario.</div>
-          <ul>
-            <li>Comprar PLA Blanco próximamente.</li>
-            <li>Programar mantenimiento de la Ender 3.</li>
-            <li>El PLA Negro es suficiente para los próximos 15 pedidos.</li>
-          </ul>
+          <div class="health-score" id="healthScore">—</div>
+          <div class="health-text" id="healthText">Cargando...</div>
+          <ul id="healthList"></ul>
         </div>
 
         <div class="inv-cards">
           <div class="inv-card">
             <h4>Rollos disponibles</h4>
-            <div class="inv-value">32</div>
+            <div class="inv-value" id="statRollos">0</div>
           </div>
           <div class="inv-card">
             <h4>Stock bajo</h4>
-            <div class="inv-value stock-low">5</div>
+            <div class="inv-value stock-low" id="statStockBajo">0</div>
           </div>
           <div class="inv-card">
             <h4>Valor inventario</h4>
-            <div class="inv-value">$4.5M</div>
+            <div class="inv-value" id="statValor">$0</div>
           </div>
           <div class="inv-card">
             <h4>Alertas</h4>
-            <div class="inv-value">3</div>
+            <div class="inv-value" id="statAlertas">0</div>
           </div>
         </div>
 
         <div class="inv-section">
           <h3>Filamentos</h3>
-          <div class="inv-item">
-            <strong>PLA+ Rojo</strong><br />850 g disponibles<br />Costo gramo: $85<br />Valor restante: $72.250
-            <div class="progress">
-              <div class="fill" style="width: 85%"></div>
-            </div>
-          </div>
-          <div class="inv-item">
-            <strong>PETG Negro</strong><br />1 Kg disponible<br />Marca: SUNLU
-          </div>
-          <div class="inv-item">
-            <strong>PLA Blanco</strong><br /><span class="stock-low">120 g - Stock bajo</span>
-          </div>
+          <div id="listaFilamentos"></div>
         </div>
 
         <div class="inv-section">
           <h3>Productos terminados</h3>
-          <div class="inv-item">
-            Soporte Casco XTZ<br />Stock: 8 | Precio: $18.000 | Ganancia: $11.800
-          </div>
+          <div id="listaProductos"></div>
         </div>
 
         <div class="inv-section">
@@ -131,15 +114,7 @@
 
         <div class="inv-section">
           <h3>Movimientos recientes</h3>
-          <div class="inv-item">-120 g PLA Rojo (Pedido #205)</div>
-          <div class="inv-item">+1 Kg PLA Negro (Compra)</div>
-        </div>
-
-        <div class="inv-section">
-          <h3>Cálculo inteligente</h3>
-          <div class="inv-item">
-            1 Kg PLA+ = 21 piezas estimadas del soporte casco.<br />Costo por pieza: $3.910
-          </div>
+          <div id="listaMovimientos">Disponible próximamente.</div>
         </div>
       </main>
     </div>
@@ -157,6 +132,7 @@
     <script src="js/supabase-config.js"></script>
     <script src="js/auth-guard.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/inventario.js"></script>
 
 <script>
 
