@@ -108,13 +108,130 @@ async function inicializarDashboard() {
     cardInventario.style.display = "none";
   }
 
-  // ===== Actividad reciente =====
-  actualizarNotificacionesDashboard();
+  // ===== Actividad reciente (campana) =====
+  iniciarNotificacionesCampana();
+}
+
+let canalNotificacionesCampana = null;
+const leidasEnSesion = new Set();
+let notificacionesPendientesIds = [];
+
+function actualizarDotNotificaciones(visible) {
+  const dot = document.querySelector(".notif-bar .notif-dot");
+  if (dot) dot.style.display = visible ? "" : "none";
+}
+
+function renderNotificaciones(eventos) {
+  const contenedor = document.getElementById("notifDashboard");
+  if (!contenedor) return;
+
+  contenedor.innerHTML =
+    eventos.length > 0
+      ? eventos
+          .map((event) => {
+            const actor = event.actor_nombre || "Sistema";
+            const message = event.mensaje || `${actor} ${event.accion || "registró una acción"}`;
+            const text = message.startsWith(actor) ? message : `${actor} ${message}`;
+            const detalle = [event.modulo, event.detalle, formatoHoraReciente(new Date(event.created_at))]
+              .filter(Boolean)
+              .join(" · ");
+            return `
+              <div class="notif-item notif-item-clickable" data-evento-id="${event.id}" title="Marcar como leída">
+                <strong>${iconoActividad(event)} ${text}</strong>
+                <br /><small class="notif-meta">${detalle}</small>
+              </div>
+            `;
+          })
+          .join("")
+      : `<div class="notif-item">No hay novedades por ahora.</div>`;
+
+  contenedor.querySelectorAll(".notif-item-clickable").forEach((item) => {
+    item.addEventListener("click", () => {
+      marcarNotificacionesLeidas([item.dataset.eventoId]);
+    });
+  });
+}
+
+async function cargarNotificacionesPendientes() {
+  const contenedor = document.getElementById("notifDashboard");
+  if (!contenedor) return;
+  if (typeof supabaseClient === "undefined" || !supabaseClient) {
+    renderNotificaciones([]);
+    return;
+  }
+
+  const { data: authData } = await supabaseClient.auth.getUser();
+  const userId = authData?.user?.id || null;
+
+  const { data, error } = await supabaseClient
+    .from("auditoria_eventos")
+    .select("id, created_at, actor_nombre, modulo, accion, tipo, mensaje, detalle")
+    .order("created_at", { ascending: false })
+    .limit(8);
+
+  if (error) {
+    console.warn("No se pudo cargar la actividad reciente:", error.message);
+    renderNotificaciones([]);
+    return;
+  }
+
+  const eventos = data || [];
+  const ids = eventos.map((e) => e.id);
+  let leidas = new Set();
+  if (userId && ids.length > 0) {
+    const { data: filasLeidas } = await supabaseClient
+      .from("notificaciones_leidas")
+      .select("evento_id")
+      .eq("usuario_id", userId)
+      .in("evento_id", ids);
+    leidas = new Set((filasLeidas || []).map((r) => r.evento_id));
+  }
+
+  notificacionesPendientesIds = eventos
+    .filter((e) => !leidas.has(e.id) && !leidasEnSesion.has(e.id))
+    .map((e) => e.id);
+  actualizarDotNotificaciones(notificacionesPendientesIds.length > 0);
+  renderNotificaciones(eventos.filter((e) => notificacionesPendientesIds.includes(e.id)));
+}
+
+async function marcarNotificacionesLeidas(eventIds) {
+  const { data: authData } = await supabaseClient.auth.getUser();
+  const userId = authData?.user?.id;
+  if (!userId || !eventIds || eventIds.length === 0) return;
+
+  const nuevos = eventIds.filter((id) => !leidasEnSesion.has(id));
+  if (nuevos.length === 0) return;
+  nuevos.forEach((id) => leidasEnSesion.add(id));
+
+  const { error } = await supabaseClient
+    .from("notificaciones_leidas")
+    .insert(nuevos.map((evento_id) => ({ usuario_id: userId, evento_id })));
+  if (error) console.warn("No se pudo marcar como leídas:", error.message);
+
+  await cargarNotificacionesPendientes();
+}
+
+function iniciarNotificacionesCampana() {
+  if (!supabaseClient || canalNotificacionesCampana) return;
+
+  // En vivo: una auditoría nueva aparece de inmediato en la campana.
+  canalNotificacionesCampana = supabaseClient
+    .channel("elrojo-campana-realtime")
+    .on(
+      "postgres_changes",
+      { event: "INSERT", schema: "public", table: "auditoria_eventos" },
+      () => cargarNotificacionesPendientes()
+    )
+    .subscribe();
+
+  // Respaldo periódico (solo si el panel está cerrado).
   setInterval(() => {
-    if (document.getElementById("notifDashboard") && !document.querySelector(".notif-panel.open")) {
-      actualizarNotificacionesDashboard();
+    if (!document.querySelector(".notif-panel.open")) {
+      cargarNotificacionesPendientes();
     }
   }, 30000);
+
+  cargarNotificacionesPendientes();
 }
 
 function formatoHoraReciente(eventDate) {
@@ -132,48 +249,6 @@ function formatoHoraReciente(eventDate) {
 function iconoActividad(event) {
   const map = { success: "✅", warning: "⚠️", error: "❌", info: "ℹ️", system: "🔧" };
   return map[event.tipo] || "🔔";
-}
-
-async function actualizarNotificacionesDashboard() {
-  const contenedor = document.getElementById("notifDashboard");
-  if (!contenedor) return;
-  if (typeof supabaseClient === "undefined" || !supabaseClient) {
-    contenedor.innerHTML = `<div class="notif-item">No hay novedades por ahora.</div>`;
-    return;
-  }
-
-  const { data, error } = await supabaseClient
-    .from("auditoria_eventos")
-    .select("created_at, actor_nombre, modulo, accion, tipo, mensaje, detalle")
-    .order("created_at", { ascending: false })
-    .limit(8);
-
-  if (error) {
-    console.warn("No se pudo cargar la actividad reciente:", error.message);
-    contenedor.innerHTML = `<div class="notif-item">No hay novedades por ahora.</div>`;
-    return;
-  }
-
-  const eventos = data || [];
-  contenedor.innerHTML =
-    eventos.length > 0
-      ? eventos
-          .map((event) => {
-            const actor = event.actor_nombre || "Sistema";
-            const message = event.mensaje || `${actor} ${event.accion || "registró una acción"}`;
-            const text = message.startsWith(actor) ? message : `${actor} ${message}`;
-            const detalle = [event.modulo, event.detalle, formatoHoraReciente(new Date(event.created_at))]
-              .filter(Boolean)
-              .join(" · ");
-            return `
-              <div class="notif-item">
-                <strong>${iconoActividad(event)} ${text}</strong>
-                <br /><small class="notif-meta">${detalle}</small>
-              </div>
-            `;
-          })
-          .join("")
-      : `<div class="notif-item">No hay novedades por ahora.</div>`;
 }
 
 document.addEventListener("DOMContentLoaded", () => {

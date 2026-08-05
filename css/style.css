@@ -1267,6 +1267,16 @@ body {
   font-size: 12px;
 }
 
+.notif-item-clickable {
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.15s ease;
+}
+
+.notif-item-clickable:hover {
+  background: #2a2a2a;
+}
+
 .top-brand {
   display: flex;
   align-items: center;
