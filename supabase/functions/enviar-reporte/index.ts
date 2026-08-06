@@ -14,7 +14,7 @@ serve(async (req) => {
     return new Response("Método no permitido", { status: 405 });
   }
 
-  const destinatario = Deno.env.get("REPORTES_EMAIL");
+  const destinatario = (Deno.env.get("REPORTES_EMAIL") || "").toLowerCase();
   if (!destinatario) {
     return new Response("Falta el secreto REPORTES_EMAIL", { status: 500 });
   }
