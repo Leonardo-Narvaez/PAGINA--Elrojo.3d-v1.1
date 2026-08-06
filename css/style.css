@@ -566,6 +566,23 @@ body {
   display: flex;
 }
 
+/* Finanzas: visible solo para roles con acceso a dinero (auth-guard.js). */
+.sidebar-nav .nav-item[href="finanzas.html"],
+.bottom-nav .nav-item[href="finanzas.html"] {
+  display: none;
+}
+
+.sidebar-nav .nav-item.finanzas-menu-visible[href="finanzas.html"],
+.bottom-nav .nav-item.finanzas-menu-visible[href="finanzas.html"] {
+  display: flex;
+}
+
+/* Módulos sin acceso según el rol: ocultos desde auth-guard.js. */
+.sidebar-nav .nav-item.nav-item-oculto,
+.bottom-nav .nav-item.nav-item-oculto {
+  display: none;
+}
+
 /* ===== Tablet ===== */
 @media (min-width: 768px) {
   .cards {

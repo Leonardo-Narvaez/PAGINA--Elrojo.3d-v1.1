@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ELROJO.3D - Finanzas</title>
+  </head>
+  <body>
+    <div class="dashboard">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <img src="images/logo.png" alt="Elrojo.3d" class="logo-box" />
+          <div>
+            <div class="logo">@Elrojo.3d</div>
+            <div class="subtitle">Impresión 3D</div>
+          </div>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span>Inicio</a>
+          <a href="inventario.html" class="nav-item"><span class="nav-icon">📦</span>Inventario</a>
+          <a href="produccion.html" class="nav-item"><span class="nav-icon">🖨️</span>Producción</a>
+          <a href="ventas.html" class="nav-item"><span class="nav-icon">🧾</span>Ventas</a>
+          <a href="finanzas.html" class="nav-item active"><span class="nav-icon">💵</span>Finanzas</a>
+        </nav>
+
+        <div class="sidebar-user">
+          <div class="user-menu-wrapper">
+            <button class="user-menu-btn" onclick="toggleNotifications(this)">
+              <span class="user-avatar">👤</span>
+              <span class="user-info">
+                <span class="user-name"></span>
+                <span class="user-role">Ver cuenta</span>
+              </span>
+              <span class="user-caret">⌄</span>
+            </button>
+            <div class="user-menu">
+              <a href="#" class="user-menu-item danger" onclick="cerrarSesionSupabase(); return false;">🚪 Cerrar sesión</a>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="content">
+        <div class="top">
+          <div class="top-brand mobile-only">
+            <img src="images/logo.png" alt="Elrojo.3d" class="top-logo" />
+            <div>
+              <div class="logo">@Elrojo.3d</div>
+              <div class="subtitle">FINANZAS</div>
+            </div>
+          </div>
+
+          <div class="top-actions">
+            <div class="user-menu-wrapper">
+              <button class="icon-btn" aria-label="Perfil" onclick="toggleNotifications(this)">👤</button>
+              <div class="user-menu">
+                <a href="#" class="user-menu-item danger" onclick="cerrarSesionSupabase(); return false;">🚪 Cerrar sesión</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h1 class="page-title">Finanzas</h1>
+        <div class="description-left">Ingresos, gastos y utilidad de tu negocio en un solo lugar.</div>
+
+        <div class="filter-tabs" id="finanzasTabs">
+          <button class="filter-tab active" data-tab="resumen" onclick="cambiarTabFinanzas('resumen')">📊 Resumen</button>
+          <button class="filter-tab" data-tab="ingresos" onclick="cambiarTabFinanzas('ingresos')">💚 Ingresos</button>
+          <button class="filter-tab" data-tab="gastos" onclick="cambiarTabFinanzas('gastos')">💸 Gastos</button>
+        </div>
+
+        <!-- ===== Resumen ===== -->
+        <div id="vistaResumen">
+          <div class="inv-cards">
+            <div class="inv-card">
+              <h4>Ingresos del mes</h4>
+              <div class="inv-value" id="resIngresosMes">$0</div>
+            </div>
+            <div class="inv-card">
+              <h4>Gastos del mes</h4>
+              <div class="inv-value" id="resGastosMes">$0</div>
+            </div>
+            <div class="inv-card">
+              <h4>Utilidad del mes</h4>
+              <div class="inv-value" id="resUtilidadMes">$0</div>
+            </div>
+            <div class="inv-card">
+              <h4>Margen</h4>
+              <div class="inv-value" id="resMargen">0%</div>
+            </div>
+          </div>
+
+          <div class="inv-section">
+            <h3>Movimientos recientes</h3>
+            <div class="stock-list" id="listaMovimientos"></div>
+          </div>
+        </div>
+
+        <!-- ===== Ingresos ===== -->
+        <div id="vistaIngresos" style="display: none">
+          <form class="inv-section form-card" id="formIngresoFinanzas">
+            <h3>Nuevo ingreso</h3>
+            <div class="input-group">
+              <label>Concepto</label>
+              <input type="text" id="ingresoFConcepto" placeholder="Ej. Venta directa en feria" required />
+            </div>
+            <div class="form-row">
+              <div class="input-group">
+                <label>Monto</label>
+                <input type="number" id="ingresoFMonto" min="0" placeholder="50000" required />
+              </div>
+              <div class="input-group">
+                <label>Fecha</label>
+                <input type="date" id="ingresoFFecha" required />
+              </div>
+            </div>
+            <div class="input-group">
+              <label>Método de pago</label>
+              <select id="ingresoFMetodoPago">
+                <option>Efectivo</option>
+                <option>Transferencia</option>
+                <option>Otro</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>Notas (opcional)</label>
+              <textarea id="ingresoFNotas" rows="2" placeholder="Detalles adicionales..."></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="action primary">💾 Registrar ingreso</button>
+            </div>
+          </form>
+
+          <div class="inv-section" id="seccionListaIngresos">
+            <h3>Historial de ingresos</h3>
+            <div class="stock-list" id="listaIngresos"></div>
+          </div>
+        </div>
+
+        <!-- ===== Gastos ===== -->
+        <div id="vistaGastos" style="display: none">
+          <form class="inv-section form-card" id="formGastoFinanzas">
+            <h3>Nuevo gasto</h3>
+            <div class="input-group">
+              <label>Concepto</label>
+              <input type="text" id="gastoFConcepto" placeholder="Ej. Rollo de filamento PLA" required />
+            </div>
+            <div class="form-row">
+              <div class="input-group">
+                <label>Monto</label>
+                <input type="number" id="gastoFMonto" min="0" placeholder="120000" required />
+              </div>
+              <div class="input-group">
+                <label>Fecha</label>
+                <input type="date" id="gastoFFecha" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="input-group">
+                <label>Categoría</label>
+                <select id="gastoFCategoria">
+                  <option>Filamentos</option>
+                  <option>Equipos</option>
+                  <option>Servicios</option>
+                  <option>Envíos</option>
+                  <option>Alquiler</option>
+                  <option>Otros</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label>Método de pago</label>
+                <select id="gastoFMetodoPago">
+                  <option>Efectivo</option>
+                  <option>Transferencia</option>
+                  <option>Otro</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group">
+              <label>Notas (opcional)</label>
+              <textarea id="gastoFNotas" rows="2" placeholder="Detalles adicionales..."></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="action primary">💾 Registrar gasto</button>
+            </div>
+          </form>
+
+          <div class="inv-section" id="seccionListaGastos">
+            <h3>Historial de gastos</h3>
+            <div class="stock-list" id="listaGastos"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div class="bottom-nav mobile-only">
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span>Inicio</a>
+      <a href="inventario.html" class="nav-item"><span class="nav-icon">📦</span>Inventario</a>
+      <a href="produccion.html" class="nav-item"><span class="nav-icon">🖨️</span>Producción</a>
+      <a href="ventas.html" class="nav-item"><span class="nav-icon">🧾</span>Ventas</a>
+      <a href="finanzas.html" class="nav-item active"><span class="nav-icon">💵</span>Finanzas</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth-guard.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/pedidos.js"></script>
+    <script src="js/finanzas.js"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const autorizado = await verificarSesion();
+
+    if (!autorizado) {
+        return;
+    }
+
+    await verificarRol(["Ventas"]);
+
+});
+
+</script>
+
+  </body>
+</html>

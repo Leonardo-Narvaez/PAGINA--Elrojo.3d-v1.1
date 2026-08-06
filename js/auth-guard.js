@@ -190,6 +190,7 @@ function mostrarUsuarioEnPantalla(usuario) {
 function configurarMenuAdministrador(rol) {
 
     const esAdministrador = rol === "Administrador";
+    const veFinanzas = esAdministrador || rol === "Ventas";
     const paginasAdministrativas = [
         "administrador.html",
         "gestion-inventario.html",
@@ -215,6 +216,45 @@ function configurarMenuAdministrador(rol) {
         enlace.classList.add("admin-menu-link");
         enlace.classList.toggle("admin-menu-visible", esAdministrador);
         enlace.classList.toggle("active", esAdministrador && enModuloAdministrador);
+
+        let enlaceFinanzas = [...menu.querySelectorAll("a.nav-item")]
+            .find((item) => item.getAttribute("href") === "finanzas.html");
+
+        if (!enlaceFinanzas) {
+            enlaceFinanzas = document.createElement("a");
+            enlaceFinanzas.href = "finanzas.html";
+            enlaceFinanzas.className = "nav-item finanzas-menu-link";
+            enlaceFinanzas.innerHTML = '<span class="nav-icon">💵</span>' +
+                (menu.classList.contains("bottom-nav") ? "Finanzas" : "Finanzas");
+            menu.appendChild(enlaceFinanzas);
+        }
+
+        enlaceFinanzas.classList.add("finanzas-menu-link");
+        enlaceFinanzas.classList.toggle("finanzas-menu-visible", veFinanzas);
+        enlaceFinanzas.classList.toggle("active", veFinanzas && paginaActual === "finanzas.html");
+    });
+
+    configurarVisibilidadMenu(rol);
+}
+
+// Oculta los módulos a los que el rol actual no tiene acceso. Cada enlace del
+// menú se cruza con el mapa de roles permitidos; si el rol no está en la lista,
+// la opción desaparece (nav-item-oculto). La validación real sigue en verificarRol().
+function configurarVisibilidadMenu(rol) {
+    const rolesPorModulo = {
+        "dashboard.html": ["Administrador", "Ventas", "Producción"],
+        "inventario.html": ["Administrador", "Producción"],
+        "produccion.html": ["Administrador", "Producción"],
+        "ventas.html": ["Administrador", "Ventas"],
+        "finanzas.html": ["Administrador", "Ventas"],
+        "administrador.html": ["Administrador"],
+    };
+
+    document.querySelectorAll(".sidebar-nav a.nav-item, .bottom-nav a.nav-item").forEach((item) => {
+        const href = item.getAttribute("href");
+        const roles = rolesPorModulo[href];
+        if (!roles) return;
+        item.classList.toggle("nav-item-oculto", !roles.includes(rol));
     });
 }
 

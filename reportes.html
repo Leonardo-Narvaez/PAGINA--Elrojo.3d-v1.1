@@ -79,139 +79,147 @@
         <h1 class="page-title desktop-only">Reportes</h1>
         <div class="description-left desktop-only">Centro de inteligencia del negocio</div>
 
-        <div class="health-card">
-          <h2 class="health-title">Business score</h2>
-          <div class="health-score">95 / 100</div>
-          <p class="score-tag">Excelente</p>
-          <div class="score-breakdown">
-            <p>Ventas .............. 98%</p>
-            <p>Producción .......... 94%</p>
-            <p>Inventario .......... 91%</p>
-            <p>Clientes ............ 96%</p>
-            <p>Rentabilidad ........ 92%</p>
-            <p>Marketing ........... 88%</p>
+        <div class="inv-section" id="filtrosReporte">
+          <h3>Filtros del reporte</h3>
+          <div class="form-row" style="flex-wrap: wrap">
+            <div class="input-group">
+              <label>Desde</label>
+              <input type="date" id="filtroDesde" onchange="aplicarFiltros()" />
+            </div>
+            <div class="input-group">
+              <label>Hasta</label>
+              <input type="date" id="filtroHasta" onchange="aplicarFiltros()" />
+            </div>
+            <div class="input-group">
+              <label>Sección</label>
+              <select id="filtroSeccion" onchange="aplicarFiltroSeccion()">
+                <option value="todos">Todas</option>
+                <option value="score">Business score y salud</option>
+                <option value="resumen">Resumen ejecutivo</option>
+                <option value="ventas">Ventas</option>
+                <option value="produccion">Producción</option>
+                <option value="inventario">Inventario</option>
+                <option value="clientes">Clientes</option>
+                <option value="top">Top productos</option>
+                <option value="ia">IA del negocio</option>
+                <option value="recomendaciones">Recomendaciones</option>
+              </select>
+            </div>
+          </div>
+          <div class="actions" style="margin-top: 12px">
+            <button class="action" type="button" onclick="aplicarRangoRapido('hoy')">Hoy</button>
+            <button class="action" type="button" onclick="aplicarRangoRapido('7d')">7 días</button>
+            <button class="action" type="button" onclick="aplicarRangoRapido('30d')">30 días</button>
+            <button class="action" type="button" onclick="aplicarRangoRapido('mes')">Este mes</button>
+            <button class="action" type="button" onclick="aplicarRangoRapido('todo')">Todo</button>
           </div>
         </div>
 
-        <div class="health-card">
+        <div class="health-card" data-seccion="score">
+          <h2 class="health-title">Business score</h2>
+          <div class="health-score" id="scoreBusiness">—</div>
+          <p class="score-tag" id="tagBusiness">Calculando...</p>
+          <div class="score-breakdown">
+            <p>Ventas .............. <span id="scoreVentas">—</span></p>
+            <p>Producción .......... <span id="scoreProduccion">—</span></p>
+            <p>Inventario .......... <span id="scoreInventario">—</span></p>
+            <p>Clientes ............ <span id="scoreClientes">—</span></p>
+            <p>Rentabilidad ........ <span id="scoreRentabilidad">—</span></p>
+            <p>Marketing ........... <span id="scoreMarketing">N/D</span></p>
+          </div>
+        </div>
+
+        <div class="health-card" data-seccion="score">
           <h2 class="health-title">Salud del negocio</h2>
-          <div class="health-score">94%</div>
-          <ul>
-            <li>Tus ventas aumentaron un 18%.</li>
-            <li>Producción al 85%.</li>
-            <li>Inventario saludable.</li>
-            <li>Clientes VIP aumentaron un 12%.</li>
+          <div class="health-score" id="saludGeneral">—</div>
+          <ul id="listaSalud">
+            <li>Cargando...</li>
           </ul>
         </div>
 
-        <div class="inv-section">
+        <div class="inv-section" data-seccion="resumen">
           <h3>Resumen ejecutivo</h3>
           <div class="inv-cards inv-cards-6">
             <div class="inv-card">
               <h4>Ventas</h4>
-              <div class="inv-value">$5.4M</div>
+              <div class="inv-value" id="resumenVentas">$0</div>
             </div>
             <div class="inv-card">
               <h4>Ganancia</h4>
-              <div class="inv-value">$3.2M</div>
+              <div class="inv-value" id="resumenGanancia">$0</div>
             </div>
             <div class="inv-card">
               <h4>Pedidos</h4>
-              <div class="inv-value">86</div>
+              <div class="inv-value" id="resumenPedidos">0</div>
             </div>
             <div class="inv-card">
               <h4>Productos</h4>
-              <div class="inv-value">134</div>
+              <div class="inv-value" id="resumenProductos">0</div>
             </div>
             <div class="inv-card">
               <h4>Clientes</h4>
-              <div class="inv-value">18</div>
+              <div class="inv-value" id="resumenClientes">0</div>
             </div>
             <div class="inv-card">
               <h4>Recompra</h4>
-              <div class="inv-value">74%</div>
+              <div class="inv-value" id="resumenRecompra">0%</div>
             </div>
           </div>
         </div>
 
-        <div class="inv-section">
-          <h3>Ventas - Últimos 30 días</h3>
-          <div class="bar-chart">
-            <div class="bar" style="height: 40%"></div>
-            <div class="bar" style="height: 65%"></div>
-            <div class="bar" style="height: 55%"></div>
-            <div class="bar" style="height: 80%"></div>
-            <div class="bar" style="height: 70%"></div>
-            <div class="bar" style="height: 90%"></div>
-          </div>
+        <div class="inv-section" data-seccion="ventas">
+          <h3 id="tituloGrafico">Ventas - Últimos 30 días</h3>
+          <div class="bar-chart" id="barraVentas30"></div>
         </div>
 
-        <div class="inv-section">
+        <div class="inv-section" data-seccion="produccion">
           <h3>Producción</h3>
-          <ul>
-            <li>58 pedidos producidos.</li>
-            <li>145 horas de impresión.</li>
-            <li>3 impresiones fallidas.</li>
-            <li>Tiempo promedio: 6 horas.</li>
+          <ul id="listaProduccion">
+            <li>Cargando...</li>
           </ul>
         </div>
 
-        <div class="inv-section">
+        <div class="inv-section" data-seccion="inventario">
           <h3>Inventario</h3>
-          <ul>
-            <li>Salud del inventario: 92%</li>
-            <li>8.5 Kg de filamento disponibles.</li>
-            <li>4 productos agotados.</li>
-            <li>PLA Negro es el más utilizado.</li>
+          <ul id="listaInventario">
+            <li>Cargando...</li>
           </ul>
         </div>
 
-        <div class="inv-section">
+        <div class="inv-section" data-seccion="clientes">
           <h3>Clientes</h3>
-          <ul>
-            <li>Cliente del mes: Leonardo.</li>
-            <li>Clientes VIP: 8.</li>
-            <li>Clientes nuevos: 18.</li>
-            <li>Recompra: 78%.</li>
+          <ul id="listaClientes">
+            <li>Cargando...</li>
           </ul>
         </div>
 
-        <div class="inv-section">
+        <div class="inv-section" data-seccion="top">
           <h3>Top productos</h3>
-          <ul>
-            <li>Soporte Casco - 45 ventas.</li>
-            <li>Logo LED - 31 ventas.</li>
-            <li>Llavero Personalizado - 26 ventas.</li>
-            <li>Base Gamer - 18 ventas.</li>
+          <ul id="listaTopProductos">
+            <li>Cargando...</li>
           </ul>
         </div>
 
-        <div class="health-card">
+        <div class="health-card" data-seccion="ia">
           <h2 class="health-title">IA del negocio</h2>
-          <ul>
-            <li>Tus ventas aumentan los fines de semana.</li>
-            <li>El PLA Negro genera el 45% de las ventas.</li>
-            <li>Tus clientes VIP compran cada 18 días.</li>
-            <li>Tus productos personalizados son más rentables.</li>
+          <ul id="listaIA">
+            <li>Cargando...</li>
           </ul>
         </div>
 
-        <div class="health-card">
+        <div class="health-card" data-seccion="recomendaciones">
           <h2 class="health-title">Recomendaciones</h2>
-          <ul>
-            <li>Comprar 3 Kg de PLA Negro.</li>
-            <li>Promocionar logos personalizados.</li>
-            <li>Crear combo motociclista.</li>
-            <li>Producir 25 soportes para casco.</li>
+          <ul id="listaRecomendaciones">
+            <li>Cargando...</li>
           </ul>
         </div>
 
-        <div class="inv-section">
+        <div class="inv-section" id="seccionExportar">
           <h3>Exportar reportes</h3>
-          <div class="export-btn">📄 Exportar PDF</div>
-          <div class="export-btn">📊 Exportar Excel</div>
-          <div class="export-btn">📑 Exportar CSV</div>
-          <div class="export-btn">✉️ Enviar por correo</div>
+          <button class="export-btn" type="button" onclick="exportarPDF()">📄 Exportar PDF</button>
+          <button class="export-btn" type="button" onclick="exportarExcel()">📊 Exportar Excel</button>
+          <button class="export-btn" type="button" onclick="exportarCSV()">📑 Exportar CSV</button>
+          <button class="export-btn" type="button" onclick="enviarReporteCorreo()">✉️ Enviar por correo</button>
         </div>
       </main>
     </div>
@@ -230,6 +238,8 @@
     <script src="js/supabase-config.js"></script>
     <script src="js/auth-guard.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/pedidos.js"></script>
+    <script src="js/reportes.js"></script>
 
 <script>
 
@@ -241,7 +251,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    await verificarRol([]);
+    await verificarRol(["Administrador"]);
 
 });
 
