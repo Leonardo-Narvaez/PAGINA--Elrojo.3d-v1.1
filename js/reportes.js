@@ -540,7 +540,10 @@ function exportarCSV() {
 async function enviarReporteCorreo() {
   const cuerpo = {
     rango: descripcionRango(),
-    csv: construirCSV(),
+    secciones: seccionesVisibles().map((s) => ({
+      titulo: SECCION_ETIQUETA[s],
+      filas: datosReporte[s] || [],
+    })),
   };
   try {
     const { error } = await supabaseClient.functions.invoke("enviar-reporte", { body: cuerpo });
