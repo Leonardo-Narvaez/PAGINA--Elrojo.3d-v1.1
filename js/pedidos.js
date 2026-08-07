@@ -4,6 +4,8 @@
 let pedidosCache = [];
 let filtroEstado = "todos";
 let filtroPago = "todos";
+let busquedaPedido = "";
+const modoConsulta = document.body.getAttribute("data-modo-pedidos") === "consulta";
 
 function supabaseListoPedidos() {
   if (typeof supabaseClient === "undefined" || !supabaseClient) {
@@ -87,19 +89,43 @@ function tarjetaPedido(p) {
   `;
 }
 
+function tarjetaPedidoConsulta(p) {
+  const entrega = p.entrega_sin_definir || !p.fecha_entrega ? "Sin definir" : p.fecha_entrega;
+
+  return `
+    <div class="pedido-card" data-estado="${p.estado}" data-pago="${p.estado_pago}">
+      <div class="pedido-main">
+        <div class="pedido-producto">${p.numero ? `<strong>${p.numero}</strong> · ` : ""}${p.producto}</div>
+        <div class="pedido-cliente">${p.cliente}${p.asesor ? ` · Asesor: ${p.asesor}` : ""}</div>
+      </div>
+      <div class="pedido-badges">
+        ${badgeEstado(p.estado)}
+        ${badgePago(p.estado_pago)}
+      </div>
+      <div class="pedido-meta">Cantidad: ${p.cantidad} · Entrega: ${entrega}</div>
+      ${p.observaciones ? `<div class="pedido-notas">${p.observaciones}</div>` : ""}
+    </div>
+  `;
+}
+
 function renderPedidos() {
   const contenedor = document.getElementById("listaPedidos");
   if (!contenedor) return;
 
+  const q = busquedaPedido.trim().toLowerCase();
   const filtrados = pedidosCache.filter((p) => {
     const okEstado = filtroEstado === "todos" || p.estado === filtroEstado;
     const okPago = filtroPago === "todos" || p.estado_pago === filtroPago;
-    return okEstado && okPago;
+    if (!okEstado || !okPago) return false;
+    if (!q) return true;
+    const texto = [p.numero, p.cliente, p.producto].map((v) => String(v || "").toLowerCase()).join(" ");
+    return texto.includes(q);
   });
 
+  const render = modoConsulta ? tarjetaPedidoConsulta : tarjetaPedido;
   contenedor.innerHTML =
     filtrados.length > 0
-      ? filtrados.map(tarjetaPedido).join("")
+      ? filtrados.map(render).join("")
       : `<p class="empty-state">No hay pedidos que coincidan con estos filtros.</p>`;
 }
 
@@ -336,6 +362,12 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   if (selectPago) selectPago.addEventListener("change", () => {
     filtroPago = selectPago.value;
+    renderPedidos();
+  });
+
+  const buscador = document.getElementById("buscadorPedido");
+  if (buscador) buscador.addEventListener("input", () => {
+    busquedaPedido = buscador.value;
     renderPedidos();
   });
 });
